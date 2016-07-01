@@ -172,7 +172,7 @@
     <scm>
         <connection>scm:git:git@github.com:accelad-com/nilgiri-math.git</connection>
         <developerConnection>scm:git:git@github.com:accelad-com/nilgiri-math.git</developerConnection>
-        <url>git@github.com:freddyb2/excel-reader-writer.git</url>
+        <url>git@github.com:accelad-com/nilgiri-math.git</url>
         <tag>HEAD</tag>
     </scm>
 
