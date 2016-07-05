@@ -14,9 +14,6 @@
     <organization>
         <name>AccelaD</name>
     </organization>
-	<properties>
-		<maven.javadoc.failOnError>false</maven.javadoc.failOnError>
-	</properties>
 
     <dependencies>
         <dependency>
