@@ -4,27 +4,14 @@ import java.util.List;
 
 import com.accelad.math.nilgiri.Field;
 
-/**
- * A differential function whose value are in X. Partial derivatives of an
- * object f of DifferentialFunction&ltX&gt are given by f.diff(x) where x is an
- * object of Variable&ltX&gt.
- *
- * @author uniker9
- *
- * @param <X>
- *            A set forms a field.
- */
+
 public abstract class DifferentialFunction<X extends Field<X>>
         implements Field<DifferentialFunction<X>>, Differential<X, DifferentialFunction<X>> {
 
     protected DifferentialFunction() {
     }
 
-    /**
-     * Returns the value in X of the function.
-     *
-     * @return the value.
-     */
+
     public abstract X getValue();
 
     @Override
@@ -39,20 +26,12 @@ public abstract class DifferentialFunction<X extends Field<X>>
         return (13 - precision) > Math.log10(getReal()) + 1;
     }
 
-    /**
-     * Returns true if this is a constant.
-     *
-     * @return true if this is a constant.
-     */
+
     public boolean isConstant() {
         return false;
     }
 
-    /**
-     * Returns true if this is a variable.
-     *
-     * @return true if this is a variable.
-     */
+
     public boolean isVariable() {
         return false;
     }

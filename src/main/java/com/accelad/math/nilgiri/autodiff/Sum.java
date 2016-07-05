@@ -4,24 +4,9 @@ import java.util.List;
 
 import com.accelad.math.nilgiri.Field;
 
-/**
- * A sum of two objects of DifferentialFunction&ltX&gt.
- *
- * @author uniker9
- *
- * @param <X>
- *            A set forms a field.
- */
+
 public class Sum<X extends Field<X>> extends AbstractBinaryFunction<X> {
 
-    /**
-     * Constructs an object whose value is (i_v1 + i_v2)
-     *
-     * @param i_v1
-     *            left argument of an addition operator +.
-     * @param i_v2
-     *            right argument of an addition operator +.
-     */
     public Sum(DifferentialFunction<X> i_v1, DifferentialFunction<X> i_v2) {
         super(i_v1, i_v2);
     }

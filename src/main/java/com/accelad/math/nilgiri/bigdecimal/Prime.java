@@ -6,37 +6,17 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Prime numbers. The implementation is a very basic computation of the set of
- * all primes on demand, growing infinitely without any defined upper limit. The
- * effects of such scheme are (i) the lookup-times become shorter after a while
- * as more and more primes have been used and stored. The applications appear to
- * become faster. (ii) Using the implementation for factorizations may easily
- * require all available memory and stall finally, because indeed a dense list
- * of primes with growing upper bound is kept without any hashing or lagging
- * scheme.
- *
- * @since 2006-08-11
- * @author Richard J. Mathar
- */
+
 public class Prime {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Prime.class);
-    /**
-     * The list of all numbers as a vector.
-     */
+
     static ArrayList<BigInteger> a = new ArrayList<>();
 
-    /**
-     * The maximum integer covered by the high end of the list.
-     */
+
     protected static BigInteger nMax = new BigInteger("-1");
 
-    /**
-     * Default constructor initializing a list of primes up to 17. 17 is enough
-     * to call the Miller-Rabin tests on the first 7 primes without further
-     * action.
-     */
+
     public Prime() {
         if (a.isEmpty()) {
             a.add(new BigInteger(Integer.toString(2)));
@@ -50,13 +30,7 @@ public class Prime {
         nMax = a.get(a.size() - 1);
     }
 
-    /**
-     * Test if a number is a prime.
-     *
-     * @param n
-     *            the integer to be tested for primality
-     * @return true if prime, false if not
-     */
+
     public boolean contains(BigInteger n) {
         switch (millerRabin(n)) {
         case -1:
@@ -68,17 +42,7 @@ public class Prime {
         return a.contains(n);
     }
 
-    /**
-     * Test whether a number n is a strong pseudoprime to base a.
-     *
-     * @param n
-     *            the integer to be tested for primality
-     * @param a
-     *            the base
-     * @return true if the test is passed, so n may be a prime. false if the
-     *         test is not passed, so n is not a prime.
-     * @since 2010-02-25
-     */
+
     public boolean isSPP(final BigInteger n, final BigInteger a) {
         final BigInteger two = new BigInteger(Integer.toString(2));
 
@@ -122,15 +86,7 @@ public class Prime {
         }
     }
 
-    /**
-     * Miller-Rabin primality tests.
-     *
-     * @param n
-     *            The prime candidate
-     * @return -1 if n is a composite, 1 if it is a prime, 0 if it may be a
-     *         prime.
-     * @since 2010-02-25
-     */
+
     public int millerRabin(final BigInteger n) {
         /*
          * list of limiting numbers which fail tests on k primes, A014233 in the
@@ -165,13 +121,7 @@ public class Prime {
         return 1;
     }
 
-    /**
-     * return the ithprime
-     *
-     * @param i
-     *            the zero-based index into the list of primes
-     * @return the ith prime. This is 2 if i=0, 3 if i=1 and so forth.
-     */
+
     public BigInteger at(int i) {
         /*
          * If the current list is too small, increase in intervals of 5 until
@@ -183,13 +133,7 @@ public class Prime {
         return a.get(i);
     }
 
-    /**
-     * return the count of primes <= n
-     *
-     * @param n
-     *            the upper limit of the scan
-     * @return the ith prime. This is 2 if i=0, 3 if i=1 and so forth.
-     */
+
     public BigInteger pi(BigInteger n) {
         /*
          * If the current list is too small, increase in intervals of 5 until
@@ -203,14 +147,7 @@ public class Prime {
         return r;
     }
 
-    /**
-     * return the smallest prime larger than n
-     *
-     * @param n
-     *            lower limit of the search
-     * @return the next larger prime.
-     * @since 2008-10-16
-     */
+
     public BigInteger nextprime(BigInteger n) {
         /* if n <=1, return 2 */
         if (n.compareTo(BigInteger.ONE) <= 0)
@@ -229,14 +166,7 @@ public class Prime {
         return a.get(a.size() - 1);
     }
 
-    /**
-     * return the largest prime smaller than n
-     *
-     * @param n
-     *            upper limit of the search
-     * @return the next smaller prime.
-     * @since 2008-10-17
-     */
+
     public BigInteger prevprime(BigInteger n) {
         /* if n <=2, return 0 */
         if (n.compareTo(BigInteger.ONE) <= 0)
@@ -255,13 +185,7 @@ public class Prime {
         return a.get(a.size() - 1);
     }
 
-    /**
-     * extend the list of known primes up to n
-     *
-     * @param n
-     *            the maximum integer known to be prime or not prime after the
-     *            call.
-     */
+
     protected void growto(BigInteger n) {
         while (nMax.compareTo(n) < 0) {
             nMax = nMax.add(BigInteger.ONE);
@@ -287,13 +211,7 @@ public class Prime {
         }
     }
 
-    /**
-     * Test program. Usage: java -cp . org.nevec.rjm.Prime n<br>
-     * This takes a single argument (n) and prints prime(n), the previous and
-     * next prime, and pi(n).
-     *
-     * @since 2006-08-14
-     */
+
     public static void main(String[] args) throws Exception {
         Prime a = new Prime();
         int n = (new Integer(args[0])).intValue();

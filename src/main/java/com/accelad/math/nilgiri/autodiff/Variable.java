@@ -5,14 +5,7 @@ import java.util.List;
 import com.accelad.math.nilgiri.AbstractIdentityFactory;
 import com.accelad.math.nilgiri.Field;
 
-/**
- * Variables in X forms a field.
- *
- * @author uniker9
- *
- * @param <X>
- *            A set forms a field.
- */
+
 public class Variable<X extends Field<X>> extends DifferentialFunction<X> {
 
     private X m_x;
@@ -49,20 +42,10 @@ public class Variable<X extends Field<X>> extends DifferentialFunction<X> {
         }
     }
 
-    /**
-     * Returns the name of this variable.
-     *
-     * @return the name.
-     */
     public String getName() {
         return m_name;
     }
 
-    /**
-     * Set this value to i_v.
-     *
-     * @param i_v
-     */
     public void set(X i_v) {
         if (i_v != null) {
             m_x = i_v;

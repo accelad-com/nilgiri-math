@@ -1,11 +1,6 @@
 package com.accelad.math.nilgiri;
 
-/**
- * A singleton factory for creating the zero element and unity of DoubleReal.
- *
- * @author uniker9
- *
- */
+
 public class DoubleRealFactory implements AbstractRealNumberFactory<DoubleReal> {
 
     private static final DoubleRealFactory m_INSTANCE = new DoubleRealFactory();
@@ -13,21 +8,12 @@ public class DoubleRealFactory implements AbstractRealNumberFactory<DoubleReal> 
     private DoubleRealFactory() {
     }
 
-    /**
-     * Returns the singleton object of this class.
-     *
-     * @return the singleton object of this class.
-     */
+
     public static DoubleRealFactory instance() {
         return m_INSTANCE;
     }
 
-    /**
-     * Returns an object of DoubleReal whose value is i_v.
-     *
-     * @param i_v
-     * @return DoubleReal(i_v)
-     */
+
     @Override
     public DoubleReal val(double i_v) {
         return new DoubleReal(i_v);

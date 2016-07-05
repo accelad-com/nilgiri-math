@@ -5,15 +5,7 @@ import java.util.List;
 import com.accelad.math.nilgiri.AbstractIdentityFactory;
 import com.accelad.math.nilgiri.Field;
 
-/**
- * A constant in X forms a field. Computations are done correctly while objects
- * of this class and those values are immutable.
- *
- * @author uniker9
- *
- * @param <X>
- *            A set forms a field.
- */
+
 public class Constant<X extends Field<X>> extends DifferentialFunction<X> {
 
     private X m_x;

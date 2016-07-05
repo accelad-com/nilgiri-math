@@ -3,24 +3,10 @@ package com.accelad.math.nilgiri.bigdecimal;
 import java.security.*;
 import java.math.*;
 
-/**
- * BigDecimal special functions. <a href="http://arxiv.org/abs/0908.3030">A Java
- * Math.BigDecimal Implementation of Core Mathematical Functions</a>
- *
- * @since 2009-05-22
- * @author Richard J. Mathar
- * @see <a href="http://apfloat.org/">apfloat</a>
- * @see <a href="http://dfp.sourceforge.net/">dfp</a>
- * @see <a href="http://jscience.org/">JScience</a>
- */
+
 public class BigDecimalMath {
 
-    /**
-     * The base of the natural logarithm in a predefined accuracy.
-     * http://www.cs.arizona.edu/icon/oddsends/e.htm The precision of the
-     * predefined constant is one less than the string's length, taking into
-     * account the decimal dot. static int E_PRECISION = E.length()-1 ;
-     */
+
     static BigDecimal E = new BigDecimal(
             "2.71828182845904523536028747135266249775724709369995957496696762772407663035354"
                     + "759457138217852516642742746639193200305992181741359662904357290033429526059563"
@@ -41,9 +27,7 @@ public class BigDecimalMath {
                     + "251644507818244235294863637214174023889344124796357437026375529444833799801612"
                     + "549227850925778256209262264832627793338656648162772516401910590049164499828931");
 
-    /**
-     * Euler's constant Pi. http://www.cs.arizona.edu/icon/oddsends/pi.htm
-     */
+
     static BigDecimal PI = new BigDecimal(
             "3.14159265358979323846264338327950288419716939937510582097494459230781640628620"
                     + "899862803482534211706798214808651328230664709384460955058223172535940812848111"
@@ -67,11 +51,7 @@ public class BigDecimalMath {
                     + "092721079750930295532116534498720275596023648066549911988183479775356636980742"
                     + "654252786255181841757467289097777279380008164706001614524919217321721477235014");
 
-    /**
-     * Euler-Mascheroni constant lower-case gamma.
-     * http://www.worldwideschool.org/library/books/sci/math/
-     * MiscellaneousMathematicalConstants/chap35.html
-     */
+
     static BigDecimal GAMMA = new BigDecimal("0.577215664901532860606512090082402431"
             + "0421593359399235988057672348848677267776646709369470632917467495146314472498070"
             + "8248096050401448654283622417399764492353625350033374293733773767394279259525824"
@@ -93,11 +73,7 @@ public class BigDecimalMath {
             + "8256199010288075612519913751167821764361905705844078357350158005607745793421314"
             + "49885007864151716151945");
 
-    /**
-     * Natural logarithm of 2.
-     * http://www.worldwideschool.org/library/books/sci/math/
-     * MiscellaneousMathematicalConstants/chap58.html
-     */
+
     static BigDecimal LOG2 = new BigDecimal("0.693147180559945309417232121458176568075"
             + "50013436025525412068000949339362196969471560586332699641868754200148102057068573"
             + "368552023575813055703267075163507596193072757082837143519030703862389167347112335"
@@ -120,14 +96,7 @@ public class BigDecimalMath {
             + "667519339312890431641370681397776498176974868903887789991296503619270710889264105"
             + "230924783917373501229842420499568935992206602204654941510613");
 
-    /**
-     * Euler's constant.
-     *
-     * @param mc
-     *            The required precision of the result.
-     * @return 3.14159...
-     * @since 2009-05-29
-     */
+
     static public BigDecimal pi(final MathContext mc) {
         /* look it up if possible */
         if (mc.getPrecision() < PI.precision())
@@ -143,14 +112,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.pi */
 
-    /**
-     * Euler-Mascheroni constant.
-     *
-     * @param mc
-     *            The required precision of the result.
-     * @return 0.577...
-     * @since 2009-08-13
-     */
+
     static public BigDecimal gamma(MathContext mc) {
         /* look it up if possible */
         if (mc.getPrecision() < GAMMA.precision())
@@ -192,15 +154,7 @@ public class BigDecimalMath {
 
     } /* BigDecimalMath.gamma */
 
-    /**
-     * The square root.
-     *
-     * @param x
-     *            the non-negative argument.
-     * @param mc
-     * @return the square root of the BigDecimal.
-     * @since 2008-10-27
-     */
+
     static public BigDecimal sqrt(final BigDecimal x, final MathContext mc) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
             throw new ArithmeticException("negative argument " + x.toString() + " of square root");
@@ -237,15 +191,7 @@ public class BigDecimalMath {
         return s;
     } /* BigDecimalMath.sqrt */
 
-    /**
-     * The square root.
-     *
-     * @param x
-     *            the non-negative argument.
-     * @return the square root of the BigDecimal rounded to the precision
-     *         implied by x.
-     * @since 2009-06-25
-     */
+
     static public BigDecimal sqrt(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
             throw new ArithmeticException("negative argument " + x.toString() + " of square root");
@@ -253,15 +199,7 @@ public class BigDecimalMath {
         return root(2, x);
     } /* BigDecimalMath.sqrt */
 
-    /**
-     * The cube root.
-     *
-     * @param x
-     *            The argument.
-     * @return The cubic root of the BigDecimal rounded to the precision implied
-     *         by x. The sign of the result is the sign of the argument.
-     * @since 2009-08-16
-     */
+
     static public BigDecimal cbrt(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
             return root(3, x.negate()).negate();
@@ -269,17 +207,7 @@ public class BigDecimalMath {
             return root(3, x);
     } /* BigDecimalMath.cbrt */
 
-    /**
-     * The integer root.
-     *
-     * @param n
-     *            the positive argument.
-     * @param x
-     *            the non-negative argument.
-     * @return The n-th root of the BigDecimal rounded to the precision implied
-     *         by x, x^(1/n).
-     * @since 2009-07-30
-     */
+
     static public BigDecimal root(final int n, final BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
             throw new ArithmeticException("negative argument " + x.toString() + " of root");
@@ -325,17 +253,7 @@ public class BigDecimalMath {
         return s.round(new MathContext(err2prec(eps)));
     } /* BigDecimalMath.root */
 
-    /**
-     * The hypotenuse.
-     *
-     * @param x
-     *            the first argument.
-     * @param y
-     *            the second argument.
-     * @return the square root of the sum of the squares of the two arguments,
-     *         sqrt(x^2+y^2).
-     * @since 2009-06-25
-     */
+
     static public BigDecimal hypot(final BigDecimal x, final BigDecimal y) {
         /*
          * compute x^2+y^2
@@ -361,17 +279,7 @@ public class BigDecimalMath {
         return z.round(mc);
     } /* BigDecimalMath.hypot */
 
-    /**
-     * The hypotenuse.
-     *
-     * @param n
-     *            the first argument.
-     * @param x
-     *            the second argument.
-     * @return the square root of the sum of the squares of the two arguments,
-     *         sqrt(n^2+x^2).
-     * @since 2009-08-05
-     */
+
     static public BigDecimal hypot(final int n, final BigDecimal x) {
         /*
          * compute n^2+x^2 in infinite precision
@@ -398,25 +306,10 @@ public class BigDecimalMath {
         return z.round(mc);
     } /* BigDecimalMath.hypot */
 
-    /**
-     * A suggestion for the maximum numter of terms in the Taylor expansion of
-     * the exponential.
-     */
+
     static private int TAYLOR_NTERM = 8;
 
-    /**
-     * The exponential function.
-     *
-     * @param x
-     *            the argument.
-     * @return exp(x). The precision of the result is implicitly defined by the
-     *         precision in the argument. In particular this means that
-     *         "Invalid Operation" errors are thrown if catastrophic
-     *         cancellation of digits causes the result to have no valid digits
-     *         left.
-     * @since 2009-05-29
-     * @author Richard J. Mathar
-     */
+
     static public BigDecimal exp(BigDecimal x) {
         /*
          * To calculate the value if x is negative, use exp(-x) = 1/exp(x)
@@ -522,14 +415,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.exp */
 
-    /**
-     * The base of the natural logarithm.
-     *
-     * @param mc
-     *            the required precision of the result
-     * @return exp(1) = 2.71828....
-     * @since 2009-05-29
-     */
+
     static public BigDecimal exp(final MathContext mc) {
         /* look it up if possible */
         if (mc.getPrecision() < E.precision())
@@ -544,16 +430,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.exp */
 
-    /**
-     * The natural logarithm.
-     *
-     * @param x
-     *            the argument.
-     * @return ln(x). The precision of the result is implicitly defined by the
-     *         precision in the argument.
-     * @since 2009-05-29
-     * @author Richard J. Mathar
-     */
+
     static public BigDecimal log(BigDecimal x) {
         /*
          * the value is undefined if x is negative.
@@ -620,17 +497,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.log */
 
-    /**
-     * The natural logarithm.
-     *
-     * @param n
-     *            The main argument, a strictly positive integer.
-     * @param mc
-     *            The requirements on the precision.
-     * @return ln(n).
-     * @since 2009-08-08
-     * @author Richard J. Mathar
-     */
+
     static public BigDecimal log(int n, final MathContext mc) {
         /*
          * the value is undefined if x is negative.
@@ -792,17 +659,7 @@ public class BigDecimalMath {
         }
     } /* log */
 
-    /**
-     * The natural logarithm.
-     *
-     * @param r
-     *            The main argument, a strictly positive value.
-     * @param mc
-     *            The requirements on the precision.
-     * @return ln(r).
-     * @since 2009-08-09
-     * @author Richard J. Mathar
-     */
+
     static public BigDecimal log(final Rational r, final MathContext mc) {
         /*
          * the value is undefined if x is negative.
@@ -833,17 +690,7 @@ public class BigDecimalMath {
         }
     } /* log */
 
-    /**
-     * Power function.
-     *
-     * @param x
-     *            Base of the power.
-     * @param y
-     *            Exponent of the power.
-     * @return x^y. The estimation of the relative error in the result is
-     *         |log(x)*err(y)|+|y*err(x)/x|
-     * @since 2009-06-01
-     */
+
     static public BigDecimal pow(final BigDecimal x, final BigDecimal y) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
             throw new ArithmeticException("Cannot power negative " + x.toString());
@@ -868,21 +715,9 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.pow */
 
-    /**
-     * Raise to an integer power and round.
-     *
-     * @param x
-     *            The base.
-     * @param n
-     *            The exponent.
-     * @return x^n.
-     * @since 2009-08-13
-     * @since 2010-05-26 handle also n<0 cases.
-     */
+
     static public BigDecimal powRound(final BigDecimal x, final int n) {
-        /**
-         * Special cases: x^1=x and x^0 = 1
-         */
+
         if (n == 1)
             return x;
         else if (n == 0)
@@ -904,45 +739,18 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.powRound */
 
-    /**
-     * Raise to an integer power and round.
-     *
-     * @param x
-     *            The base.
-     * @param n
-     *            The exponent. The current implementation allows n only in the
-     *            interval of the standard int values.
-     * @return x^n.
-     * @since 2010-05-26
-     */
+
     static public BigDecimal powRound(final BigDecimal x, final BigInteger n) {
-        /**
-         * For now, the implementation forwards to the cases where n is in the
-         * range of the standard integers. This might, however, be implemented
-         * to decompose larger powers into cascaded calls to smaller ones.
-         */
+
         if (n.compareTo(Rational.MAX_INT) > 0 || n.compareTo(Rational.MIN_INT) < 0)
             throw new ProviderException("Not implemented: big power " + n.toString());
         else
             return powRound(x, n.intValue());
     } /* BigDecimalMath.powRound */
 
-    /**
-     * Raise to a fractional power and round.
-     *
-     * @param x
-     *            The base. Generally enforced to be positive, with the
-     *            exception of integer exponents where the sign is carried over
-     *            according to the parity of the exponent.
-     * @param q
-     *            The exponent.
-     * @return x^q.
-     * @since 2010-05-26
-     */
+
     static public BigDecimal powRound(final BigDecimal x, final Rational q) {
-        /**
-         * Special cases: x^1=x and x^0 = 1
-         */
+
         if (q.compareTo(BigInteger.ONE) == 0)
             return x;
         else if (q.signum() == 0)
@@ -1049,14 +857,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.powRound */
 
-    /**
-     * Trigonometric sine.
-     *
-     * @param x
-     *            The argument in radians.
-     * @return sin(x) in the range -1 to 1.
-     * @since 2009-06-01
-     */
+
     static public BigDecimal sin(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
             return sin(x.negate()).negate();
@@ -1141,14 +942,7 @@ public class BigDecimalMath {
         }
     } /* sin */
 
-    /**
-     * Trigonometric cosine.
-     *
-     * @param x
-     *            The argument in radians.
-     * @return cos(x) in the range -1 to 1.
-     * @since 2009-06-01
-     */
+
     static public BigDecimal cos(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
             return cos(x.negate());
@@ -1235,13 +1029,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.cos */
 
-    /**
-     * The trigonometric tangent.
-     *
-     * @param x
-     *            the argument in radians.
-     * @return the tan(x)
-     */
+
     static public BigDecimal tan(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
@@ -1299,14 +1087,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.tan */
 
-    /**
-     * The trigonometric co-tangent.
-     *
-     * @param x
-     *            the argument in radians.
-     * @return the cot(x)
-     * @since 2009-07-31
-     */
+
     static public BigDecimal cot(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0) {
             throw new ArithmeticException("Cannot take cot of zero " + x.toString());
@@ -1362,13 +1143,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.cot */
 
-    /**
-     * The inverse trigonometric sine.
-     *
-     * @param x
-     *            the argument.
-     * @return the arcsin(x) in radians.
-     */
+
     static public BigDecimal asin(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ONE) > 0 || x.compareTo(BigDecimal.ONE.negate()) < 0) {
             throw new ArithmeticException("Out of range argument " + x.toString() + " of asin");
@@ -1465,14 +1240,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.asin */
 
-    /**
-     * The inverse trigonometric cosine.
-     *
-     * @param x
-     *            the argument.
-     * @return the arccos(x) in radians.
-     * @since 2009-09-29
-     */
+
     static public BigDecimal acos(final BigDecimal x) {
         /*
          * Essentially forwarded to pi/2 - asin(x)
@@ -1497,15 +1265,7 @@ public class BigDecimalMath {
 
     } /* BigDecimalMath.acos */
 
-    /**
-     * The inverse trigonometric tangent.
-     *
-     * @param x
-     *            the argument.
-     * @return the principal value of arctan(x) in radians in the range -pi/2 to
-     *         +pi/2.
-     * @since 2009-08-03
-     */
+
     static public BigDecimal atan(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) < 0) {
             return atan(x.negate()).negate();
@@ -1594,15 +1354,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.atan */
 
-    /**
-     * The hyperbolic cosine.
-     *
-     * @param x
-     *            The argument.
-     * @return The cosh(x) = (exp(x)+exp(-x))/2 .
-     * @author Richard J. Mathar
-     * @since 2009-08-19
-     */
+
     static public BigDecimal cosh(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
             return cos(x.negate());
@@ -1665,15 +1417,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.cosh */
 
-    /**
-     * The hyperbolic sine.
-     *
-     * @param x
-     *            the argument.
-     * @return the sinh(x) = (exp(x)-exp(-x))/2 .
-     * @author Richard J. Mathar
-     * @since 2009-08-19
-     */
+
     static public BigDecimal sinh(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
             return sinh(x.negate()).negate();
@@ -1744,15 +1488,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.sinh */
 
-    /**
-     * The hyperbolic tangent.
-     *
-     * @param x
-     *            The argument.
-     * @return The tanh(x) = sinh(x)/cosh(x).
-     * @author Richard J. Mathar
-     * @since 2009-08-20
-     */
+
     static public BigDecimal tanh(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) < 0)
             return tanh(x.negate()).negate();
@@ -1775,15 +1511,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.tanh */
 
-    /**
-     * The inverse hyperbolic sine.
-     *
-     * @param x
-     *            The argument.
-     * @return The arcsinh(x) .
-     * @author Richard J. Mathar
-     * @since 2009-08-20
-     */
+
     static public BigDecimal asinh(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ZERO) == 0)
             return BigDecimal.ZERO;
@@ -1805,15 +1533,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.asinh */
 
-    /**
-     * The inverse hyperbolic cosine.
-     *
-     * @param x
-     *            The argument.
-     * @return The arccosh(x) .
-     * @author Richard J. Mathar
-     * @since 2009-08-20
-     */
+
     static public BigDecimal acosh(final BigDecimal x) {
         if (x.compareTo(BigDecimal.ONE) < 0)
             throw new ArithmeticException("Out of range argument cosh " + x.toString());
@@ -1837,14 +1557,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.acosh */
 
-    /**
-     * The Gamma function.
-     *
-     * @param x
-     *            The argument.
-     * @return Gamma(x).
-     * @since 2009-08-06
-     */
+
     static public BigDecimal Gamma(final BigDecimal x) {
         /*
          * reduce to interval near 1.0 with the functional relation,
@@ -1937,16 +1650,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.gamma */
 
-    /**
-     * The Gamma function.
-     *
-     * @param q
-     *            The argument.
-     * @param mc
-     *            The required accuracy in the result.
-     * @return Gamma(x).
-     * @since 2010-05-26
-     */
+
     static public BigDecimal Gamma(final Rational q, final MathContext mc) {
         if (q.isBigInteger()) {
             if (q.compareTo(Rational.ZERO) <= 0)
@@ -1996,16 +1700,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.Gamma */
 
-    /**
-     * Pochhammer's function.
-     *
-     * @param x
-     *            The main argument.
-     * @param n
-     *            The non-negative index.
-     * @return (x)_n = x(x+1)(x+2)*...*(x+n-1).
-     * @since 2009-08-19
-     */
+
     static public BigDecimal pochhammer(final BigDecimal x, final int n) {
         /*
          * reduce to interval near 1.0 with the functional relation,
@@ -2039,14 +1734,7 @@ public class BigDecimalMath {
         }
     } /* BigDecimalMath.pochhammer */
 
-    /**
-     * Reduce value to the interval [0,2*Pi].
-     *
-     * @param x
-     *            the original value
-     * @return the value modulo 2*pi in the interval from 0 to 2*pi.
-     * @since 2009-06-01
-     */
+
     static public BigDecimal mod2pi(BigDecimal x) {
         /*
          * write x= 2*pi*k+r with the precision in r defined by the precision of
@@ -2084,14 +1772,7 @@ public class BigDecimalMath {
         return res.round(mc);
     } /* mod2pi */
 
-    /**
-     * Reduce value to the interval [-Pi/2,Pi/2].
-     *
-     * @param x
-     *            The original value
-     * @return The value modulo pi, shifted to the interval from -Pi/2 to Pi/2.
-     * @since 2009-07-31
-     */
+
     static public BigDecimal modpi(BigDecimal x) {
         /*
          * write x= pi*k+r with the precision in r defined by the precision of x
@@ -2132,16 +1813,7 @@ public class BigDecimalMath {
         return res.round(mc);
     } /* modpi */
 
-    /**
-     * Riemann zeta function.
-     *
-     * @param n
-     *            The positive integer argument.
-     * @param mc
-     *            Specification of the accuracy of the result.
-     * @return zeta(n).
-     * @since 2009-08-05
-     */
+
     static public BigDecimal zeta(final int n, final MathContext mc) {
         if (n <= 0)
             throw new ProviderException("Not implemented: zeta at negative argument " + n);
@@ -2307,14 +1979,7 @@ public class BigDecimalMath {
         }
     } /* zeta */
 
-    /**
-     * Riemann zeta function.
-     *
-     * @param n
-     *            The positive integer argument.
-     * @return zeta(n)-1.
-     * @since 2009-08-20
-     */
+
     static public double zeta1(final int n) {
         /*
          * precomputed static table in double precision
@@ -2389,26 +2054,12 @@ public class BigDecimalMath {
         }
     } /* zeta */
 
-    /**
-     * trigonometric cot.
-     *
-     * @param x
-     *            The argument.
-     * @return cot(x) = 1/tan(x).
-     */
+
     static public double cot(final double x) {
         return 1. / Math.tan(x);
     }
 
-    /**
-     * Digamma function.
-     *
-     * @param x
-     *            The main argument.
-     * @return psi(x). The error is sometimes up to 10 ulp, where AS 6.3.15
-     *         suffers from cancellation of digits and psi=0
-     * @since 2009-08-26
-     */
+
     static public double psi(final double x) {
         /*
          * the single positive zero of psi(x)
@@ -2476,17 +2127,7 @@ public class BigDecimalMath {
         }
     } /* psi */
 
-    /**
-     * Broadhurst ladder sequence.
-     *
-     * @param a
-     *            The vector of 8 integer arguments
-     * @param mc
-     *            Specification of the accuracy of the result
-     * @return S_(n,p)(a)
-     * @since 2009-08-09
-     * @see <a href="http://arxiv.org/abs/math/9803067">arXiv:math/9803067</a>
-     */
+
     static protected BigDecimal broadhurstBBP(final int n, final int p, final int a[],
             MathContext mc) {
         /*
@@ -2536,30 +2177,12 @@ public class BigDecimalMath {
         return res.round(mc);
     } /* broadhurstBBP */
 
-    /**
-     * Add a BigDecimal and a BigInteger.
-     *
-     * @param x
-     *            The left summand
-     * @param y
-     *            The right summand
-     * @return The sum x+y.
-     * @since 2012-03-02
-     */
+
     static public BigDecimal add(final BigDecimal x, final BigInteger y) {
         return x.add(new BigDecimal(y));
     } /* add */
 
-    /**
-     * Add and round according to the larger of the two ulp's.
-     *
-     * @param x
-     *            The left summand
-     * @param y
-     *            The right summand
-     * @return The sum x+y.
-     * @since 2009-07-30
-     */
+
     static public BigDecimal addRound(final BigDecimal x, final BigDecimal y) {
         BigDecimal resul = x.add(y);
         /*
@@ -2571,47 +2194,20 @@ public class BigDecimalMath {
         return resul.round(mc);
     } /* addRound */
 
-    /**
-     * Add and round according to the larger of the two ulp's.
-     *
-     * @param x
-     *            The left summand
-     * @param y
-     *            The right summand
-     * @return The sum x+y.
-     * @since 2010-07-19
-     */
+
     static public BigComplex addRound(final BigComplex x, final BigDecimal y) {
         final BigDecimal R = addRound(x.re, y);
         return new BigComplex(R, x.im);
     } /* addRound */
 
-    /**
-     * Add and round according to the larger of the two ulp's.
-     *
-     * @param x
-     *            The left summand
-     * @param y
-     *            The right summand
-     * @return The sum x+y.
-     * @since 2010-07-19
-     */
+
     static public BigComplex addRound(final BigComplex x, final BigComplex y) {
         final BigDecimal R = addRound(x.re, y.re);
         final BigDecimal I = addRound(x.im, y.im);
         return new BigComplex(R, I);
     } /* addRound */
 
-    /**
-     * Subtract and round according to the larger of the two ulp's.
-     *
-     * @param x
-     *            The left term.
-     * @param y
-     *            The right term.
-     * @return The difference x-y.
-     * @since 2009-07-30
-     */
+
     static public BigDecimal subtractRound(final BigDecimal x, final BigDecimal y) {
         BigDecimal resul = x.subtract(y);
         /*
@@ -2623,32 +2219,14 @@ public class BigDecimalMath {
         return resul.round(mc);
     } /* subtractRound */
 
-    /**
-     * Subtract and round according to the larger of the two ulp's.
-     *
-     * @param x
-     *            The left summand
-     * @param y
-     *            The right summand
-     * @return The difference x-y.
-     * @since 2010-07-19
-     */
+
     static public BigComplex subtractRound(final BigComplex x, final BigComplex y) {
         final BigDecimal R = subtractRound(x.re, y.re);
         final BigDecimal I = subtractRound(x.im, y.im);
         return new BigComplex(R, I);
     } /* subtractRound */
 
-    /**
-     * Multiply and round.
-     *
-     * @param x
-     *            The left factor.
-     * @param y
-     *            The right factor.
-     * @return The product x*y.
-     * @since 2009-07-30
-     */
+
     static public BigDecimal multiplyRound(final BigDecimal x, final BigDecimal y) {
         BigDecimal resul = x.multiply(y);
         /*
@@ -2659,48 +2237,21 @@ public class BigDecimalMath {
         return resul.round(mc);
     } /* multiplyRound */
 
-    /**
-     * Multiply and round.
-     *
-     * @param x
-     *            The left factor.
-     * @param y
-     *            The right factor.
-     * @return The product x*y.
-     * @since 2010-07-19
-     */
+
     static public BigComplex multiplyRound(final BigComplex x, final BigDecimal y) {
         BigDecimal R = multiplyRound(x.re, y);
         BigDecimal I = multiplyRound(x.im, y);
         return new BigComplex(R, I);
     } /* multiplyRound */
 
-    /**
-     * Multiply and round.
-     *
-     * @param x
-     *            The left factor.
-     * @param y
-     *            The right factor.
-     * @return The product x*y.
-     * @since 2010-07-19
-     */
+
     static public BigComplex multiplyRound(final BigComplex x, final BigComplex y) {
         BigDecimal R = subtractRound(multiplyRound(x.re, y.re), multiplyRound(x.im, y.im));
         BigDecimal I = addRound(multiplyRound(x.re, y.im), multiplyRound(x.im, y.re));
         return new BigComplex(R, I);
     } /* multiplyRound */
 
-    /**
-     * Multiply and round.
-     *
-     * @param x
-     *            The left factor.
-     * @param f
-     *            The right factor.
-     * @return The product x*f.
-     * @since 2009-07-30
-     */
+
     static public BigDecimal multiplyRound(final BigDecimal x, final Rational f) {
         if (f.compareTo(BigInteger.ZERO) == 0)
             return BigDecimal.ZERO;
@@ -2719,16 +2270,7 @@ public class BigDecimalMath {
         }
     }
 
-    /**
-     * Multiply and round.
-     *
-     * @param x
-     *            The left factor.
-     * @param n
-     *            The right factor.
-     * @return The product x*n.
-     * @since 2009-07-30
-     */
+
     static public BigDecimal multiplyRound(final BigDecimal x, final int n) {
         BigDecimal resul = x.multiply(new BigDecimal(n));
         /*
@@ -2738,16 +2280,7 @@ public class BigDecimalMath {
         return resul.round(mc);
     }
 
-    /**
-     * Multiply and round.
-     *
-     * @param x
-     *            The left factor.
-     * @param n
-     *            The right factor.
-     * @return the product x*n
-     * @since 2009-07-30
-     */
+
     static public BigDecimal multiplyRound(final BigDecimal x, final BigInteger n) {
         BigDecimal resul = x.multiply(new BigDecimal(n));
         /*
@@ -2757,16 +2290,7 @@ public class BigDecimalMath {
         return resul.round(mc);
     }
 
-    /**
-     * Divide and round.
-     *
-     * @param x
-     *            The numerator
-     * @param y
-     *            The denominator
-     * @return the divided x/y
-     * @since 2009-07-30
-     */
+
     static public BigDecimal divideRound(final BigDecimal x, final BigDecimal y) {
         /*
          * The estimation of the relative error in the result is
@@ -2783,14 +2307,7 @@ public class BigDecimalMath {
         return scalePrec(resul, mc);
     }
 
-    /**
-     * Build the inverse and maintain the approximate accuracy.
-     *
-     * @param z
-     *            The denominator
-     * @return The divided 1/z = [Re(z)-i*Im(z)]/ [Re^2 z + Im^2 z]
-     * @since 2010-07-19
-     */
+
     static public BigComplex invertRound(final BigComplex z) {
         if (z.im.compareTo(BigDecimal.ZERO) == 0) {
             /*
@@ -2818,30 +2335,12 @@ public class BigDecimalMath {
         }
     }
 
-    /**
-     * Divide and round.
-     *
-     * @param x
-     *            The numerator
-     * @param y
-     *            The denominator
-     * @return the divided x/y
-     * @since 2010-07-19
-     */
+
     static public BigComplex divideRound(final BigComplex x, final BigComplex y) {
         return multiplyRound(x, invertRound(y));
     }
 
-    /**
-     * Divide and round.
-     *
-     * @param x
-     *            The numerator
-     * @param n
-     *            The denominator
-     * @return the divided x/n
-     * @since 2009-07-30
-     */
+
     static public BigDecimal divideRound(final BigDecimal x, final int n) {
         /*
          * The estimation of the relative error in the result is |err(x)/x|
@@ -2850,16 +2349,7 @@ public class BigDecimalMath {
         return x.divide(new BigDecimal(n), mc);
     }
 
-    /**
-     * Divide and round.
-     *
-     * @param x
-     *            The numerator
-     * @param n
-     *            The denominator
-     * @return the divided x/n
-     * @since 2009-07-30
-     */
+
     static public BigDecimal divideRound(final BigDecimal x, final BigInteger n) {
         /*
          * The estimation of the relative error in the result is |err(x)/x|
@@ -2868,16 +2358,7 @@ public class BigDecimalMath {
         return x.divide(new BigDecimal(n), mc);
     } /* divideRound */
 
-    /**
-     * Divide and round.
-     *
-     * @param n
-     *            The numerator
-     * @param x
-     *            The denominator
-     * @return the divided n/x
-     * @since 2009-08-05
-     */
+
     static public BigDecimal divideRound(final BigInteger n, final BigDecimal x) {
         /*
          * The estimation of the relative error in the result is |err(x)/x|
@@ -2886,16 +2367,7 @@ public class BigDecimalMath {
         return new BigDecimal(n).divide(x, mc);
     } /* divideRound */
 
-    /**
-     * Divide and round.
-     *
-     * @param n
-     *            The numerator
-     * @param x
-     *            The denominator
-     * @return the divided n/x
-     * @since 2012-03-01
-     */
+
     static public BigComplex divideRound(final BigInteger n, final BigComplex x) {
         /*
          * catch case of real-valued denominator first
@@ -2914,16 +2386,7 @@ public class BigDecimalMath {
         return new BigComplex(repart, impart);
     } /* divideRound */
 
-    /**
-     * Divide and round.
-     *
-     * @param n
-     *            The numerator.
-     * @param x
-     *            The denominator.
-     * @return the divided n/x.
-     * @since 2009-08-05
-     */
+
     static public BigDecimal divideRound(final int n, final BigDecimal x) {
         /*
          * The estimation of the relative error in the result is |err(x)/x|
@@ -2932,49 +2395,17 @@ public class BigDecimalMath {
         return new BigDecimal(n).divide(x, mc);
     }
 
-    /**
-     * Append decimal zeros to the value. This returns a value which appears to
-     * have a higher precision than the input.
-     *
-     * @param x
-     *            The input value
-     * @param d
-     *            The (positive) value of zeros to be added as least significant
-     *            digits.
-     * @return The same value as the input but with increased (pseudo)
-     *         precision.
-     */
+
     static public BigDecimal scalePrec(final BigDecimal x, int d) {
         return x.setScale(d + x.scale());
     }
 
-    /**
-     * Append decimal zeros to the value. This returns a value which appears to
-     * have a higher precision than the input.
-     *
-     * @param x
-     *            The input value
-     * @param d
-     *            The (positive) value of zeros to be added as least significant
-     *            digits.
-     * @return The same value as the input but with increased (pseudo)
-     *         precision.
-     */
+
     static public BigComplex scalePrec(final BigComplex x, int d) {
         return new BigComplex(scalePrec(x.re, d), scalePrec(x.im, d));
     }
 
-    /**
-     * Boost the precision by appending decimal zeros to the value. This returns
-     * a value which appears to have a higher precision than the input.
-     *
-     * @param x
-     *            The input value
-     * @param mc
-     *            The requirement on the minimum precision on return.
-     * @return The same value as the input but with increased (pseudo)
-     *         precision.
-     */
+
     static public BigDecimal scalePrec(final BigDecimal x, final MathContext mc) {
         final int diffPr = mc.getPrecision() - x.precision();
         if (diffPr > 0)
@@ -2983,36 +2414,12 @@ public class BigDecimalMath {
             return x;
     } /* BigDecimalMath.scalePrec */
 
-    /**
-     * Convert an absolute error to a precision.
-     *
-     * @param x
-     *            The value of the variable
-     * @param xerr
-     *            The absolute error in the variable
-     * @return The number of valid digits in x. The value is rounded down, and
-     *         on the pessimistic side for that reason.
-     * @since 2009-06-25
-     */
+
     static public int err2prec(BigDecimal x, BigDecimal xerr) {
         return err2prec(xerr.divide(x, MathContext.DECIMAL64).doubleValue());
     }
 
-    /**
-     * Convert an absolute error to a precision.
-     *
-     * @param x
-     *            The value of the variable The value returned depends only on
-     *            the absolute value, not on the sign.
-     * @param xerr
-     *            The absolute error in the variable The value returned depends
-     *            only on the absolute value, not on the sign.
-     * @return The number of valid digits in x. Derived from the representation
-     *         x+- xerr, as if the error was represented in a "half width" (half
-     *         of the error bar) form. The value is rounded down, and on the
-     *         pessimistic side for that reason.
-     * @since 2009-05-30
-     */
+
     static public int err2prec(double x, double xerr) {
         /*
          * Example: an error of xerr=+-0.5 at x=100 represents 100+-0.5 with a
@@ -3021,16 +2428,7 @@ public class BigDecimalMath {
         return 1 + (int) (Math.log10(Math.abs(0.5 * x / xerr)));
     }
 
-    /**
-     * Convert a relative error to a precision.
-     *
-     * @param xerr
-     *            The relative error in the variable. The value returned depends
-     *            only on the absolute value, not on the sign.
-     * @return The number of valid digits in x. The value is rounded down, and
-     *         on the pessimistic side for that reason.
-     * @since 2009-08-05
-     */
+
     static public int err2prec(double xerr) {
         /*
          * Example: an error of xerr=+-0.5 a precision of 1 (digit), an error of
@@ -3039,19 +2437,7 @@ public class BigDecimalMath {
         return 1 + (int) (Math.log10(Math.abs(0.5 / xerr)));
     }
 
-    /**
-     * Convert a precision (relative error) to an absolute error. The is the
-     * inverse functionality of err2prec().
-     *
-     * @param x
-     *            The value of the variable The value returned depends only on
-     *            the absolute value, not on the sign.
-     * @param prec
-     *            The number of valid digits of the variable.
-     * @return the absolute error in x. Derived from the an accuracy of one half
-     *         of the ulp.
-     * @since 2009-08-09
-     */
+
     static public double prec2err(final double x, final int prec) {
         return 5. * Math.abs(x) * Math.pow(10., -prec);
     }

@@ -4,22 +4,10 @@ import java.util.List;
 
 import com.accelad.math.nilgiri.Field;
 
-/**
- * This class represents the inverse element of an argument in X with respect to
- * multiplication.
- *
- * @author uniker9
- *
- * @param <X>
- *            A set forms a field.
- */
+
 public class Inverse<X extends Field<X>> extends AbstractUnaryFunction<X> {
 
-    /**
-     * Constructs an object whose value is (1 / i_v).
-     *
-     * @param i_v
-     */
+
     public Inverse(DifferentialFunction<X> i_v) {
         super(i_v);
     }

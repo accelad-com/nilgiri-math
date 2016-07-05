@@ -4,19 +4,9 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Vector;
 
-/**
- * Factored integers. This class contains a non-negative integer with the prime
- * factor decomposition attached.
- *
- * @since 2006-08-14
- * @since 2012-02-14 The internal representation contains the bases, and becomes
- *        sparser if few prime factors are present.
- * @author Richard J. Mathar
- */
+
 public class Ifactor implements Cloneable, Comparable<Ifactor> {
-    /**
-     * The standard representation of the number
-     */
+
     public BigInteger n;
 
     /*
@@ -31,12 +21,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
 
     final public static Ifactor ZERO = new Ifactor(0);
 
-    /**
-     * Constructor given an integer. constructor with an ordinary integer
-     *
-     * @param number
-     *            the standard representation of the integer
-     */
+
     public Ifactor(int number) {
         n = new BigInteger("" + number);
         primeexp = new Vector<Integer>();
@@ -70,13 +55,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         }
     } /* Ifactor */
 
-    /**
-     * Constructor given a BigInteger . Constructor with an ordinary integer,
-     * calling a prime factor decomposition.
-     *
-     * @param number
-     *            the BigInteger representation of the integer
-     */
+
     public Ifactor(BigInteger number) {
         n = number;
         primeexp = new Vector<Integer>();
@@ -107,15 +86,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         }
     } /* Ifactor */
 
-    /**
-     * Constructor given a list of exponents of the prime factor decomposition.
-     *
-     * @param pows
-     *            the vector with the sorted list of exponents. pows[0] is the
-     *            exponent of 2, pows[1] the exponent of 3, pows[2] the exponent
-     *            of 5 etc. Note that this list does not include the primes, but
-     *            assumes a continuous prime-smooth basis.
-     */
+
     public Ifactor(Vector<Integer> pows) {
         primeexp = new Vector<Integer>(2 * pows.size());
         if (pows.size() > 0) {
@@ -135,22 +106,13 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
             n = BigInteger.ZERO;
     } /* Ifactor */
 
-    /**
-     * Copy constructor.
-     *
-     * @param oth
-     *            the value to be copied
-     */
+
     public Ifactor(Ifactor oth) {
         n = oth.n;
         primeexp = oth.primeexp;
     } /* Ifactor */
 
-    /**
-     * Deep copy.
-     *
-     * @since 2009-08-14
-     */
+
     public Ifactor clone() {
         Vector<Integer> p = (Vector<Integer>) primeexp.clone();
         Ifactor cl = new Ifactor(0);
@@ -158,26 +120,12 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return cl;
     } /* Ifactor.clone */
 
-    /**
-     * Comparison of two numbers. The value of this method is in allowing the
-     * Vector<>.contains() calls that use the value, not the reference for
-     * comparison.
-     *
-     * @param oth
-     *            the number to compare this with.
-     * @return true if both are the same numbers, false otherwise.
-     */
+
     public boolean equals(final Ifactor oth) {
         return (n.compareTo(oth.n) == 0);
     } /* Ifactor.equals */
 
-    /**
-     * Multiply with another positive integer.
-     *
-     * @param oth
-     *            the second factor.
-     * @return the product of both numbers.
-     */
+
     public Ifactor multiply(final BigInteger oth) {
         /*
          * the optimization is to factorize oth _before_ multiplying
@@ -185,13 +133,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return (multiply(new Ifactor(oth)));
     } /* Ifactor.multiply */
 
-    /**
-     * Multiply with another positive integer.
-     *
-     * @param oth
-     *            the second factor.
-     * @return the product of both numbers.
-     */
+
     public Ifactor multiply(final int oth) {
         /*
          * the optimization is to factorize oth _before_ multiplying
@@ -199,13 +141,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return (multiply(new Ifactor(oth)));
     } /* Ifactor.multiply */
 
-    /**
-     * Multiply with another positive integer.
-     *
-     * @param oth
-     *            the second factor.
-     * @return the product of both numbers.
-     */
+
     public Ifactor multiply(final Ifactor oth) {
         /*
          * This might be done similar to the lcm() implementation by adding the
@@ -217,39 +153,17 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return multGcdLcm(oth, 0);
     }
 
-    /**
-     * Lowest common multiple of this with oth.
-     *
-     * @param oth
-     *            the second parameter of lcm(this,oth)
-     * @return the lowest common multiple of both numbers. Returns zero if any
-     *         of both arguments is zero.
-     */
+
     public Ifactor lcm(final Ifactor oth) {
         return multGcdLcm(oth, 2);
     }
 
-    /**
-     * Greatest common divisor of this and oth.
-     *
-     * @param oth
-     *            the second parameter of gcd(this,oth)
-     * @return the lowest common multiple of both numbers. Returns zero if any
-     *         of both arguments is zero.
-     */
+
     public Ifactor gcd(final Ifactor oth) {
         return multGcdLcm(oth, 1);
     }
 
-    /**
-     * Multiply with another positive integer.
-     *
-     * @param oth
-     *            the second factor.
-     * @param type
-     *            0 to multiply, 1 for gcd, 2 for lcm
-     * @return the product, gcd or lcm of both numbers.
-     */
+
     protected Ifactor multGcdLcm(final Ifactor oth, int type) {
         Ifactor prod = new Ifactor(0);
         /*
@@ -376,13 +290,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return prod;
     } /* Ifactor.multGcdLcm */
 
-    /**
-     * Integer division through another positive integer.
-     *
-     * @param oth
-     *            the denominator.
-     * @return the division of this through the oth, discarding the remainder.
-     */
+
     public Ifactor divide(final Ifactor oth) {
         /*
          * todo: it'd probably be faster to cancel the gcd(this,oth) first in
@@ -392,13 +300,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return new Ifactor(n.divide(oth.n));
     } /* Ifactor.divide */
 
-    /**
-     * Summation with another positive integer
-     *
-     * @param oth
-     *            the other term.
-     * @return the sum of both numbers
-     */
+
     public Ifactor add(final BigInteger oth) {
         /*
          * avoid refactorization if oth is zero...
@@ -409,13 +311,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
             return this;
     } /* Ifactor.add */
 
-    /**
-     * Exponentiation with a positive integer.
-     *
-     * @param exponent
-     *            the non-negative exponent
-     * @return n^exponent. If exponent=0, the result is 1.
-     */
+
     public Ifactor pow(final int exponent) throws ArithmeticException {
         /*
          * three simple cases first
@@ -442,15 +338,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return pows;
     } /* Ifactor.pow */
 
-    /**
-     * Pulling the r-th root.
-     *
-     * @param r
-     *            the positive or negative (nonzero) root.
-     * @return n^(1/r). The return value falls into the Ifactor class if r is
-     *         positive, but if r is negative a Rational type is needed.
-     * @since 2009-05-18
-     */
+
     public Rational root(final int r) throws ArithmeticException {
         if (r == 0)
             throw new ArithmeticException("Cannot pull zeroth root of " + toString());
@@ -481,12 +369,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         }
     } /* Ifactor.root */
 
-    /**
-     * The set of positive divisors.
-     *
-     * @return the vector of divisors of the absolute value, sorted.
-     * @since 2010-08-27
-     */
+
     public Vector<BigInteger> divisors() {
         /*
          * Recursive approach: the divisors of p1^e1*p2^e2*..*py^ey*pz^ez are
@@ -527,20 +410,12 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return d;
     } /* Ifactor.divisors */
 
-    /**
-     * Sum of the divisors of the number.
-     *
-     * @return the sum of all divisors of the number, 1+....+n.
-     */
+
     public Ifactor sigma() {
         return sigma(1);
     } /* Ifactor.sigma */
 
-    /**
-     * Sum of the k-th powers of divisors of the number.
-     *
-     * @return the sum of all divisors of the number, 1^k+....+n^k.
-     */
+
     public Ifactor sigma(int k) {
         /*
          * the question is whether keeping a factorization is worth the effort
@@ -578,16 +453,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         }
     } /* Ifactor.sigma */
 
-    /**
-     * Divide through the highest possible power of the highest prime. If the
-     * current number is the prime factor product p1^e1 * p2*e2* p3^e3*...*py^ey
-     * * pz^ez, the value returned has the final factor pz^ez eliminated, which
-     * gives p1^e1 * p2*e2* p3^e3*...*py^ey.
-     *
-     * @return the new integer obtained by removing the highest prime power. If
-     *         this here represents 0 or 1, it is returned without change.
-     * @since 2006-08-20
-     */
+
     public Ifactor dropPrime() {
         /*
          * the cases n==1 or n ==0
@@ -612,11 +478,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return pows;
     } /* Ifactor.dropPrime */
 
-    /**
-     * Test whether this is a square of an integer (perfect square).
-     *
-     * @return true if this is an integer squared (including 0), else false
-     */
+
     public boolean issquare() {
         boolean resul = true;
         /*
@@ -629,11 +491,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return true;
     } /* Ifactor.issquare */
 
-    /**
-     * The sum of the prime factor exponents, with multiplicity.
-     *
-     * @return the sum over the primeexp numbers
-     */
+
     public int bigomega() {
         int resul = 0;
         for (int i = 1; i < primeexp.size(); i += 2)
@@ -641,22 +499,12 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return (resul);
     } /* Ifactor.bigomega */
 
-    /**
-     * The sum of the prime factor exponents, without multiplicity.
-     *
-     * @return the number of distinct prime factors.
-     * @since 2008-10-16
-     */
+
     public int omega() {
         return primeexp.size() / 2;
     } /* Ifactor.omega */
 
-    /**
-     * The square-free part.
-     *
-     * @return the minimum m such that m times this number is a square.
-     * @since 2008-10-16
-     */
+
     public BigInteger core() {
         BigInteger resul = BigInteger.ONE;
         for (int i = 0; i < primeexp.size(); i += 2)
@@ -665,13 +513,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return resul;
     } /* Ifactor.core */
 
-    /**
-     * The Moebius function. 1 if n=1, else, if k is the number of distinct
-     * prime factors, return (-1)^k, else, if k has repeated prime factors,
-     * return 0.
-     *
-     * @return the moebius function.
-     */
+
     public int moebius() {
         if (n.compareTo(BigInteger.ONE) <= 0)
             return 1;
@@ -689,13 +531,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return (k);
     } /* Ifactor.moebius */
 
-    /**
-     * Maximum of two values.
-     *
-     * @param oth
-     *            the number to compare this with.
-     * @return the larger of the two values.
-     */
+
     public Ifactor max(final Ifactor oth) {
         if (n.compareTo(oth.n) >= 0)
             return this;
@@ -703,13 +539,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
             return oth;
     } /* Ifactor.max */
 
-    /**
-     * Minimum of two values.
-     *
-     * @param oth
-     *            the number to compare this with.
-     * @return the smaller of the two values.
-     */
+
     public Ifactor min(final Ifactor oth) {
         if (n.compareTo(oth.n) <= 0)
             return this;
@@ -717,13 +547,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
             return oth;
     } /* Ifactor.min */
 
-    /**
-     * Maximum of a list of values.
-     *
-     * @param set
-     *            list of numbers.
-     * @return the largest in the list.
-     */
+
     public static Ifactor max(final Vector<Ifactor> set) {
         Ifactor resul = set.elementAt(0);
         for (int i = 1; i < set.size(); i++)
@@ -731,13 +555,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return resul;
     } /* Ifactor.max */
 
-    /**
-     * Minimum of a list of values.
-     *
-     * @param set
-     *            list of numbers.
-     * @return the smallest in the list.
-     */
+
     public static Ifactor min(final Vector<Ifactor> set) {
         Ifactor resul = set.elementAt(0);
         for (int i = 1; i < set.size(); i++)
@@ -745,24 +563,12 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return resul;
     } /* Ifactor.min */
 
-    /**
-     * Compare value against another Ifactor
-     *
-     * @param oth
-     *            The value to be compared agains.
-     * @return 1, 0 or -1 according to being larger, equal to or smaller than
-     *         oth.
-     * @since 2012-02-15
-     */
+
     public int compareTo(final Ifactor oth) {
         return n.compareTo(oth.n);
     } /* compareTo */
 
-    /**
-     * Convert to printable format
-     *
-     * @return a string of the form n:prime^pow*prime^pow*prime^pow...
-     */
+
     public String toString() {
         String resul = new String(n.toString() + ":");
         if (n.compareTo(BigInteger.ONE) == 0)
@@ -783,11 +589,7 @@ public class Ifactor implements Cloneable, Comparable<Ifactor> {
         return resul;
     } /* Ifactor.toString */
 
-    /**
-     * Test program. It takes a single argument n and prints the integer
-     * factorizaton.<br>
-     * java -cp . org.nevec.rjm.Ifactor n<br>
-     */
+
     public static void main(String[] args) throws Exception {
         BigInteger n = new BigInteger(args[0]);
         System.out.println(new Ifactor(n));

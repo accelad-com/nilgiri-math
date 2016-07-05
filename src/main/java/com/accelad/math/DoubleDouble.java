@@ -5,132 +5,24 @@ import com.google.common.math.DoubleMath;
 
 import java.io.Serializable;
 
-/**
- * Immutable, extended-precision floating-point numbers which maintain 106 bits
- * (approximately 30 decimal digits) of precision.
- * <p>
- * A DoubleDouble uses a representation containing two double-precision values.
- * A number x is represented as a pair of doubles, x.hi and x.lo, such that the
- * number represented by x is x.hi + x.lo, where
- *
- * <pre>
- *    |x.lo| <= 0.5*ulp(x.hi)
- * </pre>
- *
- * and ulp(y) means "unit in the last place of y". The basic arithmetic
- * operations are implemented using convenient properties of IEEE-754
- * floating-point arithmetic.
- * <p>
- * The range of values which can be represented is the same as in IEEE-754. The
- * precision of the representable numbers is twice as great as IEEE-754 double
- * precision.
- * <p>
- * The correctness of the arithmetic algorithms relies on operations being
- * performed with standard IEEE-754 double precision and rounding. This is the
- * Java standard arithmetic model, but for performance reasons Java
- * implementations are not constrained to using this standard by default. Some
- * processors (notably the Intel Pentium architecure) perform floating point
- * operations in (non-IEEE-754-standard) extended-precision. A JVM
- * implementation may choose to use the non-standard extended-precision as its
- * default arithmetic mode. To prevent this from happening, this code uses the
- * Java <tt>strictfp</tt> modifier, which forces all operations to take place in
- * the standard IEEE-754 rounding model.
- * <p>
- * The API provides a value-oriented interface. DoubleDouble values are
- * immutable; operations on them return new objects carrying the result of the
- * operation. This provides a much simpler semantics for writing DoubleDouble
- * expressions, and Java memory management is efficient enough that this imposes
- * very little performance penalty.
- * <p>
- * This implementation uses algorithms originally designed variously by Knuth,
- * Kahan, Dekker, and Linnainmaa. Douglas Priest developed the first C
- * implementation of these techniques. Other more recent C++ implementation are
- * due to Keith M. Briggs and David Bailey et al.
- *
- * <h3>References</h3>
- * <ul>
- * <li>Priest, D., <i>Algorithms for Arbitrary Precision Floating Point
- * Arithmetic</i>, in P. Kornerup and D. Matula, Eds., Proc. 10th Symposium on
- * Computer Arithmetic, IEEE Computer Society Press, Los Alamitos, Calif., 1991.
- * <li>Yozo Hida, Xiaoye S. Li and David H. Bailey, <i>Quad-Double Arithmetic:
- * Algorithms, Implementation, and Application</i>, manuscript, Oct 2000;
- * Lawrence Berkeley National Laboratory Report BNL-46996.
- * <li>David Bailey, <i>High Precision Software Directory</i>;
- * <tt>http://crd.lbl.gov/~dhbailey/mpdist/index.html</tt>
- * </ul>
- *
- * <hr>
- *
- * This class is based on the DoubleDouble created by Martin Davis and
- * distributed under the following license:
- *
- * <pre>
- * Copyright (c) 2008-2012 Martin Davis. All Rights Reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
- * following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following
- * disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
- * following disclaimer in the documentation and/or other materials provided with the distribution.
- *
- * 3. The name of the author may not be used to endorse or promote products derived from this software without specific
- * prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY Martin Davis "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
- * THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- * </pre>
- *
- * @author Martin Davis
- *
- */
 public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDouble>, Cloneable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
 
-    /**
-     * The value ZERO.
-     */
     public static final DoubleDouble ZERO = new DoubleDouble();
 
-    /**
-     * The value nearest to the constant Pi.
-     */
     public static final DoubleDouble PI = new DoubleDouble(3.141592653589793116e+00,
             1.224646799147353207e-16);
 
-    /**
-     * The value nearest to the constant 2 * Pi.
-     */
     public static final DoubleDouble TWO_PI = new DoubleDouble(6.283185307179586232e+00,
             2.449293598294706414e-16);
 
-    /**
-     * The value nearest to the constant Pi / 2.
-     */
     public static final DoubleDouble PI_2 = new DoubleDouble(1.570796326794896558e+00,
             6.123233995736766036e-17);
 
-    /**
-     * The value nearest to the constant e (the natural logarithm base).
-     */
     public static final DoubleDouble E = new DoubleDouble(2.718281828459045091e+00,
             1.445646891729250158e-16);
 
-    /**
-     * A value representing the result of an operation which does not return a
-     * valid number.
-     */
     public static final DoubleDouble NaN = new DoubleDouble(Double.NaN, Double.NaN);
 
     public static final DoubleDouble POSITIVE_INFINITY = new DoubleDouble(Double.POSITIVE_INFINITY,
@@ -139,15 +31,8 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     public static final DoubleDouble NEGATIVE_INFINITY = new DoubleDouble(Double.NEGATIVE_INFINITY,
             Double.NEGATIVE_INFINITY);
 
-    /**
-     * The smallest representable relative difference between two {link @
-     * DoubleDouble} values
-     */
     public static final double EPS = 1.23259516440783e-32; /* = 2^-106 */
 
-    /**
-     * The value to split a double-precision value on during multiplication
-     */
     private static final double SPLIT = 134217729.0D; // 2^27+1, for IEEE double
 
     private static final int MAX_PRINT_DIGITS = 32;
@@ -156,24 +41,11 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     private static final String SCI_NOT_EXPONENT_CHAR = "E";
     private static final String SCI_NOT_ZERO = "0.0E0";
 
-    /**
-     * Determines the decimal magnitude of a number. The magnitude is the
-     * exponent of the greatest power of 10 which is less than or equal to the
-     * number.
-     *
-     * @param x
-     *            the number to find the magnitude of
-     * @return the decimal magnitude of x
-     */
     private static int magnitude(double x) {
         final double xAbs = Math.abs(x);
         final double xLog10 = Math.log(xAbs) / Math.log(10);
         int xMag = (int) Math.floor(xLog10);
-        /**
-         * Since log computation is inexact, there may be an off-by-one error in
-         * the computed magnitude. Following tests that magnitude is correct,
-         * and adjusts it if not
-         */
+
         final double xApprox = Math.pow(10, xMag);
         if (xApprox * 10 <= xAbs) {
             xMag += 1;
@@ -182,23 +54,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return xMag;
     }
 
-    /**
-     * Converts a string representation of a real number into a DoubleDouble
-     * value. The format accepted is similar to the standard Java real number
-     * syntax. It is defined by the following regular expression:
-     *
-     * <pre>
-     * [<tt>+</tt>|<tt>-</tt>] {<i>digit</i>} [ <tt>.</tt> {<i>digit</i>} ] [ (
-     * <tt>e</tt> | <tt>E</tt> ) [<tt>+</tt>|<tt>-</tt>] {<i>digit</i>}+
-     *
-     * <pre>
-     *
-     * @param str
-     *            the string to parse
-     * @return the value of the parsed number
-     * @throws NumberFormatException
-     *             if <tt>str</tt> is not a valid representation of a number
-     */
     public static DoubleDouble parse(String str) {
         int i = 0;
         final int strlen = str.length();
@@ -285,15 +140,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     }
 
-    /**
-     * Creates a string of a given length containing the given character
-     *
-     * @param ch
-     *            the character to be repeated
-     * @param len
-     *            the len of the desired string
-     * @return the string
-     */
     private static String stringOfChar(char ch, int len) {
         final StringBuilder buf = new StringBuilder();
         for (int i = 0; i < len; i++) {
@@ -302,99 +148,38 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return buf.toString();
     }
 
-    /**
-     * Converts the <tt>double</tt> argument to a DoubleDouble number.
-     *
-     * @param x
-     *            a numeric value
-     * @return the extended precision version of the value
-     */
     public static DoubleDouble valueOf(double x) {
         return new DoubleDouble(x);
     }
 
-    /**
-     * Converts the string argument to a DoubleDouble number.
-     *
-     * @param str
-     *            a string containing a representation of a numeric value
-     * @return the extended precision version of the value
-     * @throws NumberFormatException
-     *             if <tt>s</tt> is not a valid representation of a number
-     */
     public static DoubleDouble valueOf(String str) {
         return parse(str);
     }
 
-    /**
-     * The high-order component of the double-double precision value.
-     */
     private double hi = 0.0;
 
-    /**
-     * The low-order component of the double-double precision value.
-     */
     private double lo = 0.0;
 
-    /**
-     * Creates a new DoubleDouble with value 0.0.
-     */
     public DoubleDouble() {
         init(0.0);
     }
 
-    /**
-     * Creates a new DoubleDouble with value x.
-     *
-     * @param x
-     *            the value to initialize
-     */
     public DoubleDouble(double x) {
         init(x);
     }
 
-    /**
-     * Creates a new DoubleDouble with value (hi, lo).
-     *
-     * @param hi
-     *            the high-order component
-     * @param lo
-     *            the high-order component
-     */
     public DoubleDouble(double hi, double lo) {
         init(hi, lo);
     }
 
-    /**
-     * Creates a new DoubleDouble with value equal to the argument.
-     *
-     * @param dd
-     *            the value to initialize
-     */
     public DoubleDouble(DoubleDouble dd) {
         init(dd);
     }
 
-    /**
-     * Creates a new DoubleDouble with value equal to the argument.
-     *
-     * @param str
-     *            the value to initialize by
-     * @throws NumberFormatException
-     *             if <tt>str</tt> is not a valid representation of a number
-     */
     public DoubleDouble(String str) {
         this(parse(str));
     }
 
-    /**
-     * Returns the absolute value of this value. Special cases:
-     * <ul>
-     * <li>If this value is NaN, it is returned.
-     * </ul>
-     *
-     * @return the absolute value of this value
-     */
     public DoubleDouble abs() {
         if (isNaN()) {
             return NaN;
@@ -405,11 +190,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return new DoubleDouble(this);
     }
 
-    /**
-     * For all -1 < x < 1, arccos(x) = PI/2 - arcsin(x)
-     *
-     * @return
-     */
     public DoubleDouble acos() {
         if (isNaN()) {
             return NaN;
@@ -432,13 +212,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
      * return this; }
      */
 
-    /**
-     * Returns a DoubleDouble whose value is <tt>(this + y)</tt>.
-     *
-     * @param y
-     *            the addend
-     * @return <tt>(this + y)</tt>
-     */
     public DoubleDouble add(DoubleDouble y) {
         if (isNaN()) {
             return this;
@@ -446,12 +219,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return new DoubleDouble(this).selfAdd(y);
     }
 
-    /**
-     * For all -1 < x < 1, arcsin(x) = x + x**3/(2*3) + (1 * 3 * x**5)/(2 * 4 *
-     * 5) + (1 * 3 * 5 * x**7)/(2 * 4 * 6 * 7) + ...
-     *
-     * @return
-     */
     public DoubleDouble asin() {
         // Return the arcsine of a DoubleDouble number
         if (isNaN()) {
@@ -488,14 +255,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return s;
     }
 
-    /**
-     * For -1 < x < 1, arctan(x) = x - x**3/3 + x**5/5 - x**7/7 + ... For x > 1,
-     * arctan(x) = PI/2 - 1/x + 1/(3*x**3) - 1/(5*x**5) +1/(7*x**7) - ... * For
-     * x < -1, arctan(x) = -PI/2 - 1/x + 1/(3*x**3) - 1/(5*x**5) +1/(7*x**7) -
-     * ...
-     *
-     * @return
-     */
     public DoubleDouble atan() {
         if (isNaN()) {
             return NaN;
@@ -664,17 +423,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
      * hi = u; lo = (C-u)+c; return this; }
      */
 
-    /**
-     * Returns the smallest (closest to negative infinity) value that is not
-     * less than the argument and is equal to a mathematical integer. Special
-     * cases:
-     * <ul>
-     * <li>If this value is NaN, returns NaN.
-     * </ul>
-     *
-     * @return the smallest (closest to negative infinity) value that is not
-     *         less than the argument and is equal to a mathematical integer.
-     */
     public DoubleDouble ceil() {
         if (isNaN()) {
             return NaN;
@@ -697,24 +445,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return Ci;
     }
 
-    /**
-     * This is a port of subroutine CISIA which computes cosine and sine
-     * integrals from Computation of Special Functions by Shanjie Zhang and
-     * Jianming Jin. Waiting for Professor Jin's reply. Dear Professor Jianming
-     * Jin:
-     *
-     * There is an error in subroutine CISIA in Computation of Special
-     * Functions. Under ELSE IF (x .LE. 32.0D0) THEN in the DO 25 K =M,1,-1 loop
-     * the values of BJ(1) thru BJ(M) are set. You then have the loop DO 30
-     * K=2,M,2 30 XS=XS+2.0D0*BJ(K+1) so for M even the value of BJ(M+1) will be
-     * used, but the value of BJ(M+1) has not been set.
-     *
-     * Sincerely,
-     *
-     * William Gandler
-     *
-     *
-     */
     public void cisia(DoubleDouble x, DoubleDouble Ci, DoubleDouble Si) {
         // Purpose: Compute cosine and sine integrals Si(x) and
         // Ci(x) (x >= 0)
@@ -753,7 +483,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             for (k = 2; k <= 40; k++) {
                 xr = ((((DoubleDouble.valueOf(-0.5)).multiply(xr))
                         .multiply(DoubleDouble.valueOf(k - 1)))
-                                .divide(DoubleDouble.valueOf(k * k * (2 * k - 1)))).multiply(x2);
+                        .divide(DoubleDouble.valueOf(k * k * (2 * k - 1)))).multiply(x2);
                 Ci = Ci.add(xr);
                 if ((xr.abs()).lt((Ci.abs()).multiply(DoubleDouble.valueOf(DoubleDouble.EPS)))) {
                     break;
@@ -764,7 +494,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             for (k = 1; k <= 40; k++) {
                 xr = (((((DoubleDouble.valueOf(-0.5)).multiply(xr))
                         .multiply(DoubleDouble.valueOf(2 * k - 1))).divide(DoubleDouble.valueOf(k)))
-                                .divide(DoubleDouble.valueOf(4 * k * k + 4 * k + 1))).multiply(x2);
+                        .divide(DoubleDouble.valueOf(4 * k * k + 4 * k + 1))).multiply(x2);
                 Si = Si.add(xr);
                 if ((xr.abs()).lt((Si.abs()).multiply(DoubleDouble.valueOf(DoubleDouble.EPS)))) {
                     return;
@@ -818,10 +548,10 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             xss = ((DoubleDouble.valueOf(0.5)).multiply(x)).sin();
             Ci = (((el.add(x.log())).subtract((x.multiply(xss)).multiply(xg1)))
                     .add(((DoubleDouble.valueOf(2.0)).multiply(xcs)).multiply(xg2)))
-                            .subtract(((DoubleDouble.valueOf(2.0)).multiply(xcs)).multiply(xcs));
+                    .subtract(((DoubleDouble.valueOf(2.0)).multiply(xcs)).multiply(xcs));
             Si = (((x.multiply(xcs)).multiply(xg1))
                     .add(((DoubleDouble.valueOf(2.0)).multiply(xss)).multiply(xg2)))
-                            .subtract(x.sin());
+                    .subtract(x.sin());
         } // else if x <= 32
         else {
             xr = DoubleDouble.valueOf(1.0);
@@ -847,12 +577,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return;
     }
 
-    /**
-     * Compares two DoubleDouble objects numerically.
-     *
-     * @return -1,0 or 1 depending on whether this value is less than, equal to
-     *         or greater than the value of <tt>o</tt>
-     */
     @Override
     public int compareTo(DoubleDouble other) {
 
@@ -871,11 +595,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return 0;
     }
 
-    /**
-     * For all real x, cos(x) = 1 - x**2/2! + x**4/4! - x**6/6! + ...
-     *
-     * @return
-     */
     public DoubleDouble cos() {
         boolean negate = false;
         // Return the cosine of a DoubleDouble number
@@ -917,12 +636,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return s;
     }
 
-    /**
-     * For all real x, cosh(x) = 1 + x**2/2! + x**4/4! + x**6/6! + ... +
-     * x**(2*n)/((2*n)!) + ...
-     *
-     * @return
-     */
     public DoubleDouble cosh() {
         // Return the cosh of a DoubleDouble number
         if (isNaN()) {
@@ -945,13 +658,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return s;
     }
 
-    /**
-     * Returns a DoubleDouble whose value is <tt>(this / y)</tt>.
-     *
-     * @param y
-     *            the divisor
-     * @return <tt>(this / y)</tt>
-     */
     public DoubleDouble divide(DoubleDouble y) {
         double hc, tc, hy, ty, C, c, U, u;
         C = hi / y.hi;
@@ -973,29 +679,14 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return new DoubleDouble(zhi, zlo);
     }
 
-    /**
-     * Converts this value to the nearest double-precision number.
-     *
-     * @return the nearest double-precision number to this value
-     */
     public double doubleValue() {
         return hi + lo;
     }
 
-    /**
-     * Dumps the components of this number to a string.
-     *
-     * @return a string showing the components of the number
-     */
     public String dump() {
         return "DD<" + hi + ", " + lo + ">";
     }
 
-    /**
-     * For all real, x exp(x) = 1 + x + x**2/2! + x**3/3! + x**4/4! + ...
-     *
-     * @return
-     */
     public DoubleDouble exp() {
         boolean invert = false;
         // Return the exponential of a DoubleDouble number
@@ -1037,20 +728,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     }
 
-    /**
-     * Extracts the significant digits in the decimal representation of the
-     * argument. A decimal point may be optionally inserted in the string of
-     * digits (as long as its position lies within the extracted digits - if
-     * not, the caller must prepend or append the appropriate zeroes and decimal
-     * point).
-     *
-     * @param y
-     *            the number to extract ( >= 0)
-     * @param decimalPointPos
-     *            the position in which to insert a decimal point
-     * @return the string containing the significant digits and possibly a
-     *         decimal point
-     */
     private String extractSignificantDigits(boolean insertDecimalPoint, int[] magnitude) {
         DoubleDouble y = this.abs();
         // compute *correct* magnitude of y
@@ -1076,12 +753,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             }
             final int digit = (int) y.hi;
 
-            /**
-             * If a negative remainder is encountered, simply terminate the
-             * extraction. This is robust, but maybe slightly inaccurate. My
-             * current hypothesis is that negative remainders only occur for
-             * very small lo components, so the inaccuracy is tolerable
-             */
             if (digit < 0) {
                 break;
             }
@@ -1103,11 +774,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
             boolean continueExtractingDigits = true;
 
-            /**
-             * Check if remaining digits will be 0, and if so don't output them.
-             * Do this by comparing the magnitude of the remainder with the
-             * expected precision.
-             */
             final int remMag = magnitude(y.hi);
             if (remMag < 0 && Math.abs(remMag) >= (numDigits - i)) {
                 continueExtractingDigits = false;
@@ -1119,12 +785,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         magnitude[0] = mag;
         return buf.toString();
     }
-
-    /**
-     *
-     * @param fac
-     * @return
-     */
 
     public DoubleDouble factorial(int fac) {
         DoubleDouble prod;
@@ -1141,17 +801,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return prod;
     }
 
-    /**
-     * Returns the largest (closest to positive infinity) value that is not
-     * greater than the argument and is equal to a mathematical integer. Special
-     * cases:
-     * <ul>
-     * <li>If this value is NaN, returns NaN.
-     * </ul>
-     *
-     * @return the largest (closest to positive infinity) value that is not
-     *         greater than the argument and is equal to a mathematical integer.
-     */
     public DoubleDouble floor() {
         if (isNaN()) {
             return NaN;
@@ -1166,14 +815,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return new DoubleDouble(fhi, flo);
     }
 
-    /**
-     * Tests whether this value is greater than or equals to another
-     * <tt>DoubleDouble</tt> value.
-     *
-     * @param y
-     *            a DoubleDouble value
-     * @return true if this value >= y
-     */
     public boolean ge(DoubleDouble y) {
         return (hi > y.hi) || (hi == y.hi && lo >= y.lo);
     }
@@ -1186,13 +827,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return lo;
     }
 
-    /**
-     * Returns the string for this value if it has a known representation. (E.g.
-     * NaN or 0.0)
-     *
-     * @return the string for this special number
-     * @return null if the number is not a special number
-     */
     private String getSpecialNumberString() {
         if (isZero()) {
             return "0.0";
@@ -1203,14 +837,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return null;
     }
 
-    /**
-     * Tests whether this value is greater than another <tt>DoubleDouble</tt>
-     * value.
-     *
-     * @param y
-     *            a DoubleDouble value
-     * @return true if this value > y
-     */
     public boolean gt(DoubleDouble y) {
         return (hi > y.hi) || (hi == y.hi && lo > y.lo);
     }
@@ -1228,11 +854,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         init(dd.hi, dd.lo);
     }
 
-    /**
-     * Converts this value to the nearest integer.
-     *
-     * @return the nearest integer to this value
-     */
     public int intValue() {
         return (int) hi;
     }
@@ -1241,38 +862,18 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return Double.isInfinite(hi);
     }
 
-    /**
-     * Tests whether this value is NaN.
-     *
-     * @return true if this value is NaN
-     */
     public boolean isNaN() {
         return Double.isNaN(hi);
     }
 
-    /**
-     * Tests whether this value is less than 0.
-     *
-     * @return true if this value is less than 0
-     */
     public boolean isNegative() {
         return hi < 0.0 || (hi == 0.0 && lo < 0.0);
     }
 
-    /**
-     * Tests whether this value is greater than 0.
-     *
-     * @return true if this value is greater than 0
-     */
     public boolean isPositive() {
         return hi > 0.0 || (hi == 0.0 && lo > 0.0);
     }
 
-    /**
-     * Tests whether this value is equal to 0.
-     *
-     * @return true if this value is equal to 0
-     */
     public boolean isZero() {
         return hi == 0.0 && lo == 0.0;
     }
@@ -1282,24 +883,10 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
      *------------------------------------------------------------
      */
 
-    /**
-     * Tests whether this value is less than or equal to another
-     * <tt>DoubleDouble</tt> value.
-     *
-     * @param y
-     *            a DoubleDouble value
-     * @return true if this value <= y
-     */
     public boolean le(DoubleDouble y) {
         return (hi < y.hi) || (hi == y.hi && lo <= y.lo);
     }
 
-    /**
-     * For x > 0, ratio = (x-1)/(x+1), log(x) = 2(ratio + ratio**3/3 +
-     * ratio**5/5 + ...)
-     *
-     * @return
-     */
     public DoubleDouble log() {
         // Return the natural log of a DoubleDouble number
         if (isNaN()) {
@@ -1349,14 +936,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
      *------------------------------------------------------------
      */
 
-    /**
-     * Tests whether this value is less than another <tt>DoubleDouble</tt>
-     * value.
-     *
-     * @param y
-     *            a DoubleDouble value
-     * @return true if this value < y
-     */
     public boolean lt(DoubleDouble y) {
         return (hi < y.hi) || (hi == y.hi && lo < y.lo);
     }
@@ -1377,13 +956,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         }
     }
 
-    /**
-     * Returns a DoubleDouble whose value is <tt>(this * y)</tt>.
-     *
-     * @param y
-     *            the multiplicand
-     * @return <tt>(this * y)</tt>
-     */
     public DoubleDouble multiply(DoubleDouble y) {
         if (isNaN()) {
             return this;
@@ -1398,11 +970,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return hi != y.hi || lo != y.lo;
     }
 
-    /**
-     * Returns a DoubleDouble whose value is <tt>-this</tt>.
-     *
-     * @return <tt>-this</tt>
-     */
     public DoubleDouble negate() {
         if (isNaN()) {
             return this;
@@ -1410,13 +977,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return new DoubleDouble(-hi, -lo);
     }
 
-    /**
-     *
-     * @param x
-     *            the double exponent
-     * @return a raised to the double power x For a > 0, base = x * log(a), a**x
-     *         = 1 + base + base**2/2! + base**3/3! + ...
-     */
     public DoubleDouble pow(double x) {
         boolean invert = false;
         if (Double.isNaN(x)) {
@@ -1465,13 +1025,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return s;
     }
 
-    /**
-     *
-     * @param x
-     *            the DoubleDouble exponent
-     * @return a raised to the DoubleDouble power x For a > 0, base = x *
-     *         log(a), a**x = 1 + base + base**2/2! + base**3/3! + ...
-     */
     public DoubleDouble pow(DoubleDouble x) {
         boolean invert = false;
         if (x.isNaN()) {
@@ -1520,14 +1073,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return s;
     }
 
-    /**
-     * Computes the value of this number raised to an integral power. Follows
-     * semantics of Java Math.pow as closely as possible.
-     *
-     * @param exp
-     *            the integer exponent
-     * @return x raised to the integral power exp
-     */
     public DoubleDouble pow(int exp) {
         if (exp == 0.0) {
             return valueOf(1.0);
@@ -1559,11 +1104,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return s;
     }
 
-    /**
-     * Returns a DoubleDouble whose value is <tt>1 / this</tt>.
-     *
-     * @return the reciprocal of this value
-     */
     public DoubleDouble reciprocal() {
         double hc, tc, hy, ty, bigC, c, bigU, u;
         bigC = 1.0 / hi;
@@ -1584,15 +1124,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return new DoubleDouble(zhi, zlo);
     }
 
-    /**
-     * Rounds this value to the nearest integer. The value is rounded to an
-     * integer by adding 1/2 and taking the floor of the result. Special cases:
-     * <ul>
-     * <li>If this value is NaN, returns NaN.
-     * </ul>
-     *
-     * @return this value rounded to the nearest integer
-     */
     public DoubleDouble rint() {
         if (isNaN()) {
             return this;
@@ -1602,15 +1133,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return plus5.floor();
     }
 
-    /**
-     * Adds the argument to the value of <tt>this</tt>. To prevent altering
-     * constants, this method <b>must only</b> be used on values known to be
-     * newly created.
-     *
-     * @param y
-     *            the addend
-     * @return <tt>this</tt>, with its value incremented by <tt>y</tt>
-     */
     private DoubleDouble selfAdd(DoubleDouble y) {
         double bigH, h, bigT, t, bigS, s, e, f;
         bigS = hi + y.hi;
@@ -1639,15 +1161,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
      *------------------------------------------------------------
      */
 
-    /**
-     * Multiplies this by the argument, returning this. To prevent altering
-     * constants, this method <b>must only</b> be used on values known to be
-     * newly created.
-     *
-     * @param y
-     *            a DoubleDouble value to multiply by
-     * @return this
-     */
     private DoubleDouble selfMultiply(DoubleDouble y) {
         double hx, tx, hy, ty, bigC, c;
         bigC = SPLIT * hi;
@@ -1676,17 +1189,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return si;
     }
 
-    /**
-     * Returns an integer indicating the sign of this value.
-     * <ul>
-     * <li>if this value is > 0, returns 1
-     * <li>if this value is < 0, returns -1
-     * <li>if this value is = 0, returns 0
-     * <li>if this value is NaN, returns 0
-     * </ul>
-     *
-     * @return an integer indicating the sign of this value
-     */
     public int signum() {
         if (isPositive()) {
             return 1;
@@ -1697,11 +1199,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return 0;
     }
 
-    /**
-     * For all real x, sin(x) = x - x**3/3! + x**5/5! - x**7/7! + ...
-     *
-     * @return
-     */
     public DoubleDouble sin() {
         boolean negate = false;
         // Return the sine of a DoubleDouble number
@@ -1743,12 +1240,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return s;
     }
 
-    /**
-     * For all real x, sinh(x) = x + x**3/3! + x**5/5! + x**7/7! + ... +
-     * x**(2n+1)/(2n+1)! + ...
-     *
-     * @return
-     */
     public DoubleDouble sinh() {
         // Return the sinh of a DoubleDouble number
         if (isNaN()) {
@@ -1771,22 +1262,10 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return s;
     }
 
-    /**
-     * Computes the square of this value.
-     *
-     * @return the square of this value.
-     */
     public DoubleDouble sqr() {
         return this.multiply(this);
     }
 
-    /**
-     * Computes the positive square root of this value. If the number is NaN or
-     * negative, NaN is returned.
-     *
-     * @return the positive square root of this number. If the argument is NaN
-     *         or less than zero, the result is NaN.
-     */
     public DoubleDouble sqrt() {
         /*
          * Strategy: Use Karp's trick: if x is an approximation to sqrt(a), then
@@ -1816,13 +1295,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return axdd.add(new DoubleDouble(d2));
     }
 
-    /**
-     * Returns a DoubleDouble whose value is <tt>(this - y)</tt>.
-     *
-     * @param y
-     *            the subtrahend
-     * @return <tt>(this - y)</tt>
-     */
     public DoubleDouble subtract(DoubleDouble y) {
         if (isNaN()) {
             return this;
@@ -1830,13 +1302,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return add(y.negate());
     }
 
-    /**
-     * For -PI/2 < x < PI/2, tan(x) = x + (x**3)/3 + 2*(x**5)/15 + 17*(x**7)/315
-     * + 62*(x**9)/2835 + ... + (2**(2*n))*((2**(2*n)) -
-     * 1)*Bn*(x**(2*n-1))/((2*n)!) + ...
-     *
-     * @return
-     */
     public DoubleDouble tan() {
         // Return the tangent of a DoubleDouble number
         if (isNaN()) {
@@ -1884,11 +1349,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return s;
     }
 
-    /**
-     * Returns the string representation of this value in scientific notation.
-     *
-     * @return the string representation in scientific notation
-     */
     public String toSciNotation() {
         // special case zero, to allow as
         if (isZero()) {
@@ -1929,11 +1389,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
      *------------------------------------------------------------
      */
 
-    /**
-     * Returns the string representation of this value in standard notation.
-     *
-     * @return the string representation in standard notation
-     */
     public String toStandardNotation() {
         final String specialStr = getSpecialNumberString();
         if (specialStr != null) {
@@ -1965,14 +1420,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return num;
     }
 
-    /**
-     * Returns a string representation of this number, in either standard or
-     * scientific notation. If the magnitude of the number is in the range [ 10
-     * <sup>-3</sup>, 10<sup>8</sup> ] standard notation will be used.
-     * Otherwise, scientific notation will be used.
-     *
-     * @return a string representation of this number
-     */
     @Override
     public String toString() {
         // final int mag = magnitude(hi);
@@ -1986,16 +1433,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return Double.toString(doubleValue());
     }
 
-    /**
-     * Returns the integer which is largest in absolute value and not further
-     * from zero than this value. Special cases:
-     * <ul>
-     * <li>If this value is NaN, returns NaN.
-     * </ul>
-     *
-     * @return the integer which is largest in absolute value and not further
-     *         from zero than this value
-     */
     public DoubleDouble trunc() {
         if (isNaN()) {
             return NaN;
@@ -2016,8 +1453,8 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     public boolean equals(Object object) {
         if (object instanceof DoubleDouble) {
             DoubleDouble that = (DoubleDouble) object;
-            return DoubleMath.fuzzyEquals(hi, that.hi, 1E-12)
-                    && DoubleMath.fuzzyEquals(lo, that.lo, 1E-12);
+            return DoubleMath.fuzzyEquals(hi, that.hi, 1E-12) && DoubleMath
+                    .fuzzyEquals(lo, that.lo, 1E-12);
         }
         return false;
     }

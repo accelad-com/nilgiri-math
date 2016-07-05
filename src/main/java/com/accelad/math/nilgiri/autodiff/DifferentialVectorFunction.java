@@ -9,12 +9,7 @@ import com.accelad.math.nilgiri.BasicDenseVector;
 import com.accelad.math.nilgiri.CommutativeGroup;
 import com.accelad.math.nilgiri.Field;
 
-/**
- * @author uniker9
- *
- * @param <X>
- *            A set forms a field.
- */
+
 public class DifferentialVectorFunction<X extends Field<X>>
         implements CommutativeGroup<DifferentialVectorFunction<X>>,
         Differential<X, DifferentialVectorFunction<X>> { // ,

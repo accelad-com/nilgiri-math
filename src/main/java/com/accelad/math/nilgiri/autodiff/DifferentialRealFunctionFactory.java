@@ -10,10 +10,7 @@ public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
 
     protected AbstractRealNumberFactory<X> mFactory;
 
-    /**
-     * @param i_RNFactory
-     * @param i_RFFactory
-     */
+
     public DifferentialRealFunctionFactory(AbstractRealNumberFactory<X> mFactory) {
         if (mFactory != null) {
             this.mFactory = mFactory;
