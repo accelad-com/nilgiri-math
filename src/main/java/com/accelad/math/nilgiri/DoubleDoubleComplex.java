@@ -76,7 +76,7 @@ public class DoubleDoubleComplex implements ComplexNumber<DoubleDoubleReal, Doub
         return this.log().mul(x).exp();
     }
 
-    private DoubleDoubleComplex exp() {
+    public DoubleDoubleComplex exp() {
         DoubleDoubleReal expReal = new DoubleDoubleReal(real.getDoubleDouble().exp());
         return new DoubleDoubleComplex(
                 expReal.mul(new DoubleDoubleReal(imaginary.getDoubleDouble().cos())),
@@ -144,5 +144,33 @@ public class DoubleDoubleComplex implements ComplexNumber<DoubleDoubleReal, Doub
     @Override
     public DoubleDoubleReal im() {
         return imaginary;
+    }
+
+    public DoubleDoubleComplex cos() {
+        DoubleDoubleComplex d1 = new DoubleDoubleComplex(imaginary.negate(), real).exp();
+        DoubleDoubleComplex d2 = new DoubleDoubleComplex(imaginary, real.negate()).exp();
+        return d1.plus(d2).mul(new DoubleDoubleComplex(.5));
+    }
+
+    public DoubleDoubleComplex sin() {
+        DoubleDoubleComplex d1 = new DoubleDoubleComplex(imaginary, real.negate()).exp();
+        DoubleDoubleComplex d2 = new DoubleDoubleComplex(imaginary.negate(), real).exp();
+        return d1.minus(d2).mul(new DoubleDoubleComplex(0, .5));
+    }
+
+    public DoubleDoubleComplex tan() {
+        return sin().div(cos());
+    }
+
+    public DoubleDoubleComplex pow(DoubleDoubleComplex pow) {
+        return log().mul(pow).exp();
+    }
+
+    public DoubleDoubleComplex sqrt() {
+        DoubleDouble realPart = real.plus(abs().re()).div(new DoubleDoubleReal(2)).getDoubleDouble()
+                .sqrt();
+        DoubleDouble imaginaryPart = abs().re().minus(real).div(new DoubleDoubleReal(2))
+                .getDoubleDouble().sqrt();
+        return new DoubleDoubleComplex(realPart, imaginaryPart);
     }
 }

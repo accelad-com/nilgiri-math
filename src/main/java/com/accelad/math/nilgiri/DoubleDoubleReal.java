@@ -3,7 +3,8 @@ package com.accelad.math.nilgiri;
 import com.accelad.math.DoubleDouble;
 import com.google.common.base.Objects;
 
-public class DoubleDoubleReal implements RealNumber<DoubleDoubleReal> {
+public class DoubleDoubleReal
+        implements RealNumber<DoubleDoubleReal>, Comparable<DoubleDoubleReal> {
 
     private DoubleDouble doubleDouble;
 
@@ -106,5 +107,10 @@ public class DoubleDoubleReal implements RealNumber<DoubleDoubleReal> {
             return Objects.equal(this.doubleDouble, that.doubleDouble);
         }
         return false;
+    }
+
+    @Override
+    public int compareTo(DoubleDoubleReal other) {
+        return doubleDouble.compareTo(other.doubleDouble);
     }
 }

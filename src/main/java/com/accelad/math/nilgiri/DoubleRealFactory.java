@@ -1,7 +1,7 @@
 package com.accelad.math.nilgiri;
 
 
-public class DoubleRealFactory implements AbstractRealNumberFactory<DoubleReal> {
+public class DoubleRealFactory implements AbstractFactory<DoubleReal> {
 
     private static final DoubleRealFactory m_INSTANCE = new DoubleRealFactory();
 

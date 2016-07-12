@@ -1,7 +1,7 @@
 package com.accelad.math.nilgiri;
 
 
-public interface AbstractRealNumberFactory<X extends RealNumber<X>>
+public interface AbstractFactory<X extends Field<X>>
         extends AbstractIdentityFactory<X> {
 
 
@@ -32,5 +32,4 @@ public interface AbstractRealNumberFactory<X extends RealNumber<X>>
     X square(X i_x);
 
     X floor(X value);
-
 }

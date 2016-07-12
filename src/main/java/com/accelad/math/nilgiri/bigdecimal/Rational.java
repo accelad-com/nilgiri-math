@@ -1,6 +1,9 @@
 package com.accelad.math.nilgiri.bigdecimal;
 
-import java.math.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 
 public class Rational implements Cloneable, Comparable<Rational> {

@@ -1,8 +1,7 @@
 package com.accelad.math.nilgiri.bigdecimal;
 
-import java.lang.*;
-import java.util.*;
-import java.math.*;
+import java.math.BigInteger;
+import java.util.Vector;
 
 
 public class BigIntegerMath {

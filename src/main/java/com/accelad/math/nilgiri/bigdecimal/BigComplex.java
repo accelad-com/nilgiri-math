@@ -1,7 +1,7 @@
 package com.accelad.math.nilgiri.bigdecimal;
 
-import java.lang.*;
-import java.math.*;
+import java.math.BigDecimal;
+import java.math.MathContext;
 
 
 public class BigComplex {

@@ -2,7 +2,7 @@ package com.accelad.math.nilgiri;
 
 import com.accelad.math.DoubleDouble;
 
-public class DoubleDoubleRealFactory implements AbstractRealNumberFactory<DoubleDoubleReal> {
+public class DoubleDoubleRealFactory implements AbstractFactory<DoubleDoubleReal> {
 
     private static final DoubleDoubleRealFactory m_INSTANCE = new DoubleDoubleRealFactory();
     private static final DoubleDoubleReal m_ZERO = new DoubleDoubleReal(DoubleDouble.ZERO);

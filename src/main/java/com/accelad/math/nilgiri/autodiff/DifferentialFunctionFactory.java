@@ -3,15 +3,14 @@ package com.accelad.math.nilgiri.autodiff;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.accelad.math.nilgiri.AbstractRealNumberFactory;
-import com.accelad.math.nilgiri.RealNumber;
+import com.accelad.math.nilgiri.AbstractFactory;
+import com.accelad.math.nilgiri.Field;
 
-public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
+public class DifferentialFunctionFactory<X extends Field<X>> {
 
-    protected AbstractRealNumberFactory<X> mFactory;
+    protected AbstractFactory<X> mFactory;
 
-
-    public DifferentialRealFunctionFactory(AbstractRealNumberFactory<X> mFactory) {
+    public DifferentialFunctionFactory(AbstractFactory<X> mFactory) {
         if (mFactory != null) {
             this.mFactory = mFactory;
         } else {
@@ -20,72 +19,72 @@ public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
     }
 
     public Constant<X> val(X iX) {
-        return new Constant<X>(iX, mFactory);
+        return new Constant<>(iX, mFactory);
     }
 
     public ConstantVector<X> val(X... iX) {
         int size = iX.length;
-        ArrayList<Constant<X>> list = new ArrayList<Constant<X>>(size);
+        ArrayList<Constant<X>> list = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             list.add(val(iX[i]));
         }
-        return new ConstantVector<X>(mFactory, list);
+        return new ConstantVector<>(mFactory, list);
     }
 
     // ZeroVector
     public ConstantVector<X> zero(int iSize) {
-        ArrayList<Constant<X>> list = new ArrayList<Constant<X>>(iSize);
+        ArrayList<Constant<X>> list = new ArrayList<>(iSize);
         for (int i = 0; i < iSize; i++) {
             list.add(zero());
         }
-        return new ConstantVector<X>(mFactory, list);
+        return new ConstantVector<>(mFactory, list);
     }
 
     public Variable<X> var(String iName, X iX, PreEvaluator<X> preEvaluator) {
-        return new Variable<X>(iName, iX, mFactory, preEvaluator);
+        return new Variable<>(iName, iX, mFactory, preEvaluator);
     }
 
     public Variable<X> var(String iName, X iX) {
-        return new Variable<X>(iName, iX, mFactory);
+        return new Variable<>(iName, iX, mFactory);
     }
 
     public VariableVector<X> var(String iName, X... iX) {
         int size = iX.length;
-        ArrayList<Variable<X>> list = new ArrayList<Variable<X>>(size);
+        ArrayList<Variable<X>> list = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             list.add(var(iName + String.valueOf(i), iX[i]));
         }
-        return new VariableVector<X>(mFactory, list);
+        return new VariableVector<>(mFactory, list);
     }
 
     public VariableVector<X> var(String iName, int iSize) {
-        ArrayList<Variable<X>> list = new ArrayList<Variable<X>>(iSize);
+        ArrayList<Variable<X>> list = new ArrayList<>(iSize);
         for (int i = 0; i < iSize; i++) {
             list.add(var(iName + String.valueOf(i), mFactory.zero()));
         }
-        return new VariableVector<X>(mFactory, list);
+        return new VariableVector<>(mFactory, list);
     }
 
     public DifferentialVectorFunction<X> function(DifferentialFunction<X>... iX) {
         int size = iX.length;
-        ArrayList<DifferentialFunction<X>> list = new ArrayList<DifferentialFunction<X>>(size);
+        ArrayList<DifferentialFunction<X>> list = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             list.add(iX[i]);
         }
-        return new DifferentialVectorFunction<X>(mFactory, list);
+        return new DifferentialVectorFunction<>(mFactory, list);
     }
 
-    // --------------
     public Zero<X> zero() {
-        return new Zero<X>(mFactory);
+        return new Zero<>(mFactory);
     }
 
     public One<X> one() {
-        return new One<X>(mFactory);
+        return new One<>(mFactory);
     }
 
     public DifferentialFunction<X> cos(DifferentialFunction<X> iX) {
         return new AbstractUnaryFunction<X>(iX) {
+
             @Override
             public X getValue() {
                 return mFactory.cos(arg().getValue());
@@ -110,12 +109,12 @@ public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
             public String getFormula(List<Variable<X>> variables) {
                 return "Math.cos(" + arg().getFormula(variables) + ")";
             }
-
         };
     }
 
     public DifferentialFunction<X> sin(DifferentialFunction<X> iX) {
         return new AbstractUnaryFunction<X>(iX) {
+
             @Override
             public X getValue() {
                 return mFactory.sin(arg().getValue());
@@ -145,6 +144,7 @@ public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
 
     public DifferentialFunction<X> tan(DifferentialFunction<X> iX) {
         return new AbstractUnaryFunction<X>(iX) {
+
             @Override
             public X getValue() {
                 return mFactory.tan(arg().getValue());
@@ -157,12 +157,7 @@ public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
 
             @Override
             public DifferentialFunction<X> diff(Variable<X> i_v) {
-                // return new
-                // Inverse<X>(cos(arg()).multi(cos(arg()))).multi(arg().diff(i_v));
-                // return new Inverse<X>( new Square<X>( cos(arg())
-                // )).multi(arg().diff(i_v));
-                // return pow(cos(arg()), -2).multi(arg().diff(i_v));
-                return (new PolynomialTerm<X>(1, cos(arg()), -2)).mul(arg().diff(i_v));
+                return (new PolynomialTerm<>(1, cos(arg()), -2)).mul(arg().diff(i_v));
             }
 
             @Override
@@ -179,6 +174,7 @@ public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
 
     public DifferentialFunction<X> exp(DifferentialFunction<X> iX) {
         return new AbstractUnaryFunction<X>(iX) {
+
             @Override
             public X getValue() {
                 return mFactory.exp(arg().getValue());
@@ -221,7 +217,7 @@ public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
 
             @Override
             public DifferentialFunction<X> diff(Variable<X> i_v) {
-                return new Inverse<X>(arg()).mul(arg().diff(i_v));
+                return new Inverse<>(arg()).mul(arg().diff(i_v));
             }
 
             @Override
@@ -236,26 +232,7 @@ public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
         };
     }
 
-    /*
-     * public DifferentialFunction<X> pow(DifferentialFunction<X> iX, final int
-     * i_y){
-     *
-     * return new AbstractUnaryFunction<X>(iX){
-     *
-     * @Override public X getValue(){ return m_RNFactory.pow(arg().getValue(),
-     * i_y); }
-     *
-     * @Override public DifferentialFunction<X> diff(Variable<X> i_v){
-     * //m_RNFactory. return
-     * RealFunctionFactory.this.constant(m_RNFactory.create(i_y)).multi(pow(arg(
-     * ), i_y - 1)).multi(arg().diff(i_v)); }
-     *
-     * @Override public String toString(){ return arg().toString() + "^" +
-     * String.valueOf(i_y) +" "; } }; }
-     */
-
     public DifferentialFunction<X> pow(DifferentialFunction<X> iX, Constant<X> i_y) {
-
         return new AbstractBinaryFunction<X>(iX, i_y) {
 
             @Override
@@ -270,9 +247,9 @@ public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
 
             @Override
             public DifferentialFunction<X> diff(Variable<X> i_v) {
-                Constant<X> ym1 = DifferentialRealFunctionFactory.this
+                Constant<X> ym1 = DifferentialFunctionFactory.this
                         .val(rarg().getValue().minus(mFactory.one()));
-                return rarg().mul(DifferentialRealFunctionFactory.this.pow(larg(), ym1))
+                return rarg().mul(DifferentialFunctionFactory.this.pow(larg(), ym1))
                         .mul(larg().diff(i_v));
             }
 
@@ -305,7 +282,7 @@ public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
             @Override
             public DifferentialFunction<X> diff(Variable<X> i_v) {
                 return ((sqrt(arg()).inverse())
-                        .div(DifferentialRealFunctionFactory.this.val(mFactory.one().mul(2L))))
+                        .div(DifferentialFunctionFactory.this.val(mFactory.one().mul(2L))))
                                 .mul(arg().diff(i_v));
             }
 
@@ -336,7 +313,7 @@ public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
 
             @Override
             public DifferentialFunction<X> diff(Variable<X> i_v) {
-                return arg().mul(DifferentialRealFunctionFactory.this.val(mFactory.one().mul(2L)))
+                return arg().mul(DifferentialFunctionFactory.this.val(mFactory.one().mul(2L)))
                         .mul(arg().diff(i_v));
             }
 
@@ -381,5 +358,4 @@ public class DifferentialRealFunctionFactory<X extends RealNumber<X>> {
             }
         };
     }
-
 }
