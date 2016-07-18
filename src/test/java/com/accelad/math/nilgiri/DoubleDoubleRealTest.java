@@ -16,4 +16,28 @@ public class DoubleDoubleRealTest {
         assertTrue(first.equals(second));
         assertFalse(first.equals(third));
     }
+
+    @Test
+    public void testCompareToLessThan() throws Exception {
+        DoubleDoubleReal val1 = new DoubleDoubleReal(10);
+        DoubleDoubleReal val2 = new DoubleDoubleReal(20);
+
+        assertTrue(val1.compareTo(val2) < 0);
+    }
+
+    @Test
+    public void testCompareToGreaterThan() throws Exception {
+        DoubleDoubleReal val1 = new DoubleDoubleReal(7);
+        DoubleDoubleReal val2 = new DoubleDoubleReal(-4);
+
+        assertTrue(val1.compareTo(val2) > 0);
+    }
+
+    @Test
+    public void testCompareToEqual() throws Exception {
+        DoubleDoubleReal val1 = new DoubleDoubleReal(5);
+        DoubleDoubleReal val2 = new DoubleDoubleReal(5);
+
+        assertTrue(val1.compareTo(val2) == 0);
+    }
 }

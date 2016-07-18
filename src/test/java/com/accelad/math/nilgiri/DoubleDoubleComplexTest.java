@@ -111,4 +111,49 @@ public class DoubleDoubleComplexTest {
         assertEquals(expected, result);
     }
 
+    @Test
+    public void testCos() {
+        DoubleDoubleComplex expected = new DoubleDoubleComplex(-4.189625690968, -9.109227893755);
+
+        DoubleDoubleComplex actual = new DoubleDoubleComplex(2, 3).cos();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testSin() {
+        DoubleDoubleComplex expected = new DoubleDoubleComplex(9.154499146911, -4.168906959966);
+
+        DoubleDoubleComplex actual = new DoubleDoubleComplex(2, 3).sin();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testTan() {
+        DoubleDoubleComplex expected = new DoubleDoubleComplex(-0.003764025641, 1.003238627353);
+
+        DoubleDoubleComplex actual = new DoubleDoubleComplex(2, 3).tan();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testPowComplexExponent() throws Exception {
+        DoubleDoubleComplex expected = new DoubleDoubleComplex(-3.098975623228, 1.179587754377);
+
+        DoubleDoubleComplex actual = new DoubleDoubleComplex(2, 3)
+                .pow(new DoubleDoubleComplex(4, 4));
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testSqrt() throws Exception {
+        DoubleDoubleComplex expected = new DoubleDoubleComplex(0, 1);
+
+        DoubleDoubleComplex actual = new DoubleDoubleComplex(-1).sqrt();
+
+        assertEquals(expected, actual);
+    }
 }
