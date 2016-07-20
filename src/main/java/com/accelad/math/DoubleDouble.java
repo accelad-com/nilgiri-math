@@ -878,6 +878,10 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return hi == 0.0 && lo == 0.0;
     }
 
+    public boolean isInteger() {
+        return ((hi == Math.floor(hi)) && !Double.isInfinite(hi)) && ((lo == Math
+                .floor(lo)) && !Double.isInfinite(lo));
+    }
     /*------------------------------------------------------------
      *   Conversion Functions
      *------------------------------------------------------------
@@ -977,100 +981,50 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return new DoubleDouble(-hi, -lo);
     }
 
-    public DoubleDouble pow(double x) {
-        boolean invert = false;
-        if (Double.isNaN(x)) {
-            return NaN;
-        }
-        if (Double.isInfinite(x)) {
-            return NaN;
-        }
-        if (isNaN()) {
-            return NaN;
-        }
-        if (x == 0.0) {
-            return valueOf(1.0);
-        }
-
-        if (isZero()) {
-            return NaN;
-        }
-
-        if (isNegative()) {
-            return NaN;
-        }
-        final DoubleDouble loga = this.log();
-        DoubleDouble base = DoubleDouble.valueOf(x).multiply(loga);
-        if (base.lt(DoubleDouble.valueOf(0.0))) {
-            // Much greater precision if all numbers in the series have the same
-            // sign.
-            base = base.negate();
-            invert = true;
-        }
-        DoubleDouble s = DoubleDouble.valueOf(1.0).add(base);
-        DoubleDouble sOld;
-        DoubleDouble t = new DoubleDouble(base);
-        double n = 1.0;
-
-        do {
-            n += 1.0;
-            t = t.divide(DoubleDouble.valueOf(n));
-            t = t.multiply(base);
-            sOld = s;
-            s = s.add(t);
-        } while (s.ne(sOld));
-        if (invert) {
-            s = s.reciprocal();
-        }
-        return s;
-    }
-
     public DoubleDouble pow(DoubleDouble x) {
         boolean invert = false;
-        if (x.isNaN()) {
+        if (x.isNaN() || x.isInfinite()) {
             return NaN;
-        }
-        if (x.isInfinite()) {
-            return NaN;
-        }
-        if (isNaN()) {
+        } else if (isInfinite() || isNaN()) {
             return NaN;
         }
         if (x.isZero()) {
-            return valueOf(1.0);
-        }
+            return ONE;
+        } else {
+            if (isZero()) {
+                return ZERO;
+            } else if (isNegative()) {
+                if (x.isInteger())
+                    return pow(x.intValue());
+                else
+                    return NaN;
+            } else {
+                final DoubleDouble loga = this.log();
+                DoubleDouble base = x.multiply(loga);
+                if (base.lt(ZERO)) {
+                    // Much greater precision if all numbers in the series have the same
+                    // sign.
+                    base = base.negate();
+                    invert = true;
+                }
+                DoubleDouble s = ONE.add(base);
+                DoubleDouble sOld;
+                DoubleDouble t = new DoubleDouble(base);
+                double n = 1.0;
 
-        if (isZero()) {
-            return NaN;
+                do {
+                    n += 1.0;
+                    t = t.divide(DoubleDouble.valueOf(n));
+                    t = t.multiply(base);
+                    sOld = s;
+                    s = s.add(t);
+                } while (s.ne(sOld));
+                if (invert) {
+                    s = s.reciprocal();
+                }
+                return s;
+            }
         }
-
-        if (isNegative()) {
-            return NaN;
-        }
-        final DoubleDouble loga = this.log();
-        DoubleDouble base = x.multiply(loga);
-        if (base.lt(DoubleDouble.valueOf(0.0))) {
-            // Much greater precision if all numbers in the series have the same
-            // sign.
-            base = base.negate();
-            invert = true;
-        }
-        DoubleDouble s = DoubleDouble.valueOf(1.0).add(base);
-        DoubleDouble sOld;
-        DoubleDouble t = new DoubleDouble(base);
-        double n = 1.0;
-
-        do {
-            n += 1.0;
-            t = t.divide(DoubleDouble.valueOf(n));
-            t = t.multiply(base);
-            sOld = s;
-            s = s.add(t);
-        } while (s.ne(sOld));
-        if (invert) {
-            s = s.reciprocal();
-        }
-        return s;
     }
 
     public DoubleDouble pow(int exp) {
