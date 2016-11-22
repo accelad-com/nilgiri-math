@@ -11,6 +11,12 @@ public class DoubleDoubleComplex implements ComplexNumber<DoubleDoubleReal, Doub
     public static final DoubleDoubleComplex I = new DoubleDoubleComplex(0.0, 1.0);
     public static final DoubleDoubleComplex ONE = new DoubleDoubleComplex(1.0, 0.0);
     public static final DoubleDoubleComplex ZERO = new DoubleDoubleComplex(0.0, 0.0);
+
+    private static final DoubleDoubleComplex TEN = new DoubleDoubleComplex(10.0, 0.0);
+    private static final DoubleDoubleComplex LOG_TEN = TEN.log();
+    private static final DoubleDoubleComplex NAN = new DoubleDoubleComplex(
+            new DoubleDoubleReal(DoubleDouble.NaN), new DoubleDoubleReal(DoubleDouble.NaN));
+
     private final DoubleDoubleReal imaginary;
     private final DoubleDoubleReal real;
 
@@ -24,6 +30,10 @@ public class DoubleDoubleComplex implements ComplexNumber<DoubleDoubleReal, Doub
 
     public DoubleDoubleComplex(double real, double imaginary) {
         this(new DoubleDoubleReal(real), new DoubleDoubleReal(imaginary));
+    }
+
+    public DoubleDoubleComplex(DoubleDoubleReal real) {
+        this(real, new DoubleDoubleReal());
     }
 
     public DoubleDoubleComplex(DoubleDouble real, DoubleDouble imaginary) {
@@ -60,35 +70,6 @@ public class DoubleDoubleComplex implements ComplexNumber<DoubleDoubleReal, Doub
         return new DoubleDoubleComplex(realPart, imaginaryPart);
     }
 
-    public DoubleDoubleComplex abs() {
-        return new DoubleDoubleComplex(real.pow(2).plus(imaginary.pow(2)).getDoubleDouble().sqrt(),
-                new DoubleDouble());
-    }
-
-    @Override
-    public DoubleDoubleComplex mul(DoubleDoubleComplex factor) {
-        return new DoubleDoubleComplex(real.mul(factor.real).minus(imaginary.mul(factor.imaginary)),
-                real.mul(factor.imaginary).plus(imaginary.mul(factor.real)));
-    }
-
-    @Override
-    public DoubleDoubleComplex pow(int x) {
-        return this.log().mul(x).exp();
-    }
-
-    public DoubleDoubleComplex exp() {
-        DoubleDoubleReal expReal = new DoubleDoubleReal(real.getDoubleDouble().exp());
-        return new DoubleDoubleComplex(
-                expReal.mul(new DoubleDoubleReal(imaginary.getDoubleDouble().cos())),
-                expReal.mul(new DoubleDoubleReal(imaginary.getDoubleDouble().sin())));
-    }
-
-    public DoubleDoubleComplex log() {
-        return new DoubleDoubleComplex(
-                new DoubleDoubleReal(abs().re().getDoubleDouble().log()),
-                new DoubleDoubleReal(FastMath.atan2(imaginary.doubleValue(), real.doubleValue())));
-    }
-
     @Override
     public DoubleDoubleComplex plus(DoubleDoubleComplex plusend) {
         return new DoubleDoubleComplex(real.plus(plusend.real), imaginary.plus(plusend.imaginary));
@@ -108,6 +89,56 @@ public class DoubleDoubleComplex implements ComplexNumber<DoubleDoubleReal, Doub
     @Override
     public DoubleDoubleComplex negate() {
         return new DoubleDoubleComplex(real.negate(), imaginary.negate());
+    }
+
+    @Override
+    public DoubleDoubleComplex mul(DoubleDoubleComplex factor) {
+        return new DoubleDoubleComplex(real.mul(factor.real).minus(imaginary.mul(factor.imaginary)),
+                real.mul(factor.imaginary).plus(imaginary.mul(factor.real)));
+    }
+
+    public DoubleDoubleComplex abs() {
+        return new DoubleDoubleComplex(real.pow(2).plus(imaginary.pow(2)).getDoubleDouble().sqrt(),
+                new DoubleDouble());
+    }
+
+    @Override
+    public DoubleDoubleComplex pow(int n) {
+        if(this.equals(ZERO)) {
+            if(n == 0) {
+                return NAN;
+            }
+            else {
+                return ZERO;
+            }
+        }
+        else if (n == 0) {
+            return ONE;
+        }
+        else {
+            DoubleDoubleComplex result = ZERO;
+            for (int k = 0; k <= n; k++) {
+                result = result.plus(powI(k).mul(binomialCoeff(n, k))
+                                            .mul(new DoubleDoubleComplex(real.pow(n - k),
+                                                    DoubleDoubleReal.ZERO))
+                                            .mul(new DoubleDoubleComplex(imaginary.pow(k),
+                                                    DoubleDoubleReal.ZERO)));
+            }
+            return result;
+        }
+    }
+
+    public DoubleDoubleComplex exp() {
+        DoubleDoubleReal expReal = new DoubleDoubleReal(real.getDoubleDouble().exp());
+        return new DoubleDoubleComplex(
+                expReal.mul(new DoubleDoubleReal(imaginary.getDoubleDouble().cos())),
+                expReal.mul(new DoubleDoubleReal(imaginary.getDoubleDouble().sin())));
+    }
+
+    public DoubleDoubleComplex log() {
+        return new DoubleDoubleComplex(
+                new DoubleDoubleReal(abs().re().getDoubleDouble().log()),
+                new DoubleDoubleReal(FastMath.atan2(imaginary.doubleValue(), real.doubleValue())));
     }
 
     @Override
@@ -172,5 +203,84 @@ public class DoubleDoubleComplex implements ComplexNumber<DoubleDoubleReal, Doub
         DoubleDouble imaginaryPart = abs().re().minus(real).div(new DoubleDoubleReal(2))
                 .getDoubleDouble().sqrt();
         return new DoubleDoubleComplex(realPart, imaginaryPart);
+    }
+
+    public DoubleDoubleComplex acos() {
+        return this.plus(ONE.minus(this.pow(2)).sqrt().mul(I)).log().mul(I.negate());
+    }
+
+    public DoubleDoubleComplex asin() {
+        return ONE.minus(this.pow(2)).sqrt().plus(this.mul(I)).log().mul(I.negate());
+    }
+
+    public DoubleDoubleComplex atan() {
+        return this.plus(I).div(I.minus(this)).log().mul(I.div(new DoubleDoubleComplex(2.0, 0.0)));
+    }
+
+    public DoubleDoubleComplex acosh() {
+        return this.plus(this.plus(ONE).sqrt().mul(this.minus(ONE).sqrt())).log();
+    }
+
+    public DoubleDoubleComplex asinh() {
+        return this.plus(ONE.plus(this.pow(2)).sqrt()).log();
+    }
+
+    public DoubleDoubleComplex cosh() {
+        return new DoubleDoubleComplex(
+                real.getDoubleDouble().cosh().multiply(imaginary.getDoubleDouble().cos()),
+                real.getDoubleDouble().sinh().multiply(imaginary.getDoubleDouble().sin()));
+    }
+
+    public DoubleDoubleComplex sinh() {
+        return new DoubleDoubleComplex(
+                real.getDoubleDouble().sinh().multiply(imaginary.getDoubleDouble().cos()),
+                real.getDoubleDouble().cosh().multiply(imaginary.getDoubleDouble().sin()));
+    }
+
+    public DoubleDoubleComplex tanh() {
+        DoubleDoubleReal real2 = real.mul(2);
+        DoubleDoubleReal imaginary2 = imaginary.mul(2);
+        DoubleDouble d = real2.getDoubleDouble().cosh().add(imaginary2.getDoubleDouble().cos());
+        return new DoubleDoubleComplex(real2.getDoubleDouble().sinh().divide(d),
+                imaginary2.getDoubleDouble().sin().divide(d));
+    }
+
+    public DoubleDoubleComplex atanh() {
+        return ONE.plus(this).log().minus(ONE.minus(this).log()).div(new DoubleDoubleComplex(2));
+    }
+
+    public DoubleDoubleComplex log10() {
+        return this.log().div(LOG_TEN);
+    }
+
+    public DoubleDoubleComplex pwr(DoubleDoubleComplex i_y) {
+        return this.abs().pow(i_y);
+    }
+
+    private DoubleDoubleComplex binomialCoeff(int n, int k)
+    {
+        int res = 1;
+        if ( k > n - k )
+            k = n - k;
+        for (int i = 0; i < k; ++i)
+        {
+            res *= (n - i);
+            res /= (i + 1);
+        }
+        return new DoubleDoubleComplex(res);
+    }
+
+    private DoubleDoubleComplex powI(int n) {
+        switch (n % 4) {
+        case 0:
+            return ONE;
+        case 1:
+            return I;
+        case 2:
+            return ONE.negate();
+        case 3:
+            return I.negate();
+        }
+        throw null;
     }
 }

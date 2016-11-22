@@ -11,6 +11,8 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     public static final DoubleDouble ZERO = new DoubleDouble();
 
+    public static final DoubleDouble HALF = new DoubleDouble(0.5);
+
     public static final DoubleDouble PI = new DoubleDouble(3.141592653589793116e+00,
             1.224646799147353207e-16);
 
@@ -37,7 +39,9 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     private static final int MAX_PRINT_DIGITS = 32;
     private static final DoubleDouble TEN = new DoubleDouble(10.0);
+    private static final DoubleDouble LOG_TEN = TEN.log();
     public static final DoubleDouble ONE = new DoubleDouble(1.0);
+    public static final DoubleDouble TWO = new DoubleDouble(2.0);
     private static final String SCI_NOT_EXPONENT_CHAR = "E";
     private static final String SCI_NOT_ZERO = "0.0E0";
 
@@ -435,6 +439,10 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             // do we need to renormalize here?
         }
         return new DoubleDouble(fhi, flo);
+    }
+
+    public DoubleDouble round() {
+        return this.add(new DoubleDouble(0.5)).floor();
     }
 
     public DoubleDouble Ci() {
@@ -933,6 +941,10 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             s = s.add(w);
         } while (s.ne(sOld));
         return s.add(DoubleDouble.valueOf(intPart));
+    }
+
+    public DoubleDouble log10() {
+        return this.log().divide(LOG_TEN);
     }
 
     /*------------------------------------------------------------
