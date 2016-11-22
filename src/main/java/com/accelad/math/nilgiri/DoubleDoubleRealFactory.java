@@ -1,12 +1,16 @@
 package com.accelad.math.nilgiri;
 
+import java.util.Random;
+
 import com.accelad.math.DoubleDouble;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class DoubleDoubleRealFactory implements AbstractFactory<DoubleDoubleReal> {
 
     private static final DoubleDoubleRealFactory m_INSTANCE = new DoubleDoubleRealFactory();
-    private static final DoubleDoubleReal m_ZERO = new DoubleDoubleReal(DoubleDouble.ZERO);
-    private static final DoubleDoubleReal m_UNIT = new DoubleDoubleReal(DoubleDouble.ONE);
+
+    private Random randomGenerator = new Random();
 
     private DoubleDoubleRealFactory() {
     }
@@ -21,58 +25,215 @@ public class DoubleDoubleRealFactory implements AbstractFactory<DoubleDoubleReal
     }
 
     @Override
+    public DoubleDoubleReal abs(DoubleDoubleReal x) {
+        return x.abs();
+    }
+
+    @Override
+    public DoubleDoubleReal min(DoubleDoubleReal x, DoubleDoubleReal y) {
+        return x.compareTo(y) < 0 ? x : y;
+    }
+
+    @Override
+    public DoubleDoubleReal max(DoubleDoubleReal x, DoubleDoubleReal y) {
+        return x.compareTo(y) > 0 ? x : y;
+    }
+
+    @Override
     public DoubleDoubleReal zero() {
-        return m_ZERO;
+        return DoubleDoubleReal.ZERO;
     }
 
     @Override
     public DoubleDoubleReal one() {
-        return m_UNIT;
+        return DoubleDoubleReal.ONE;
     }
 
     @Override
     public DoubleDoubleReal cos(DoubleDoubleReal value) {
-        return new DoubleDoubleReal(value.getDoubleDouble().cos());
+        return value.cos();
+    }
+
+    @Override
+    public DoubleDoubleReal acos(DoubleDoubleReal value) {
+        return value.acos();
+    }
+
+    @Override
+    public DoubleDoubleReal cosh(DoubleDoubleReal value) {
+        return value.cosh();
+    }
+
+    @Override
+    public DoubleDoubleReal acosh(DoubleDoubleReal value) {
+        return value.acosh();
     }
 
     @Override
     public DoubleDoubleReal sin(DoubleDoubleReal value) {
-        return new DoubleDoubleReal(value.getDoubleDouble().sin());
+        return value.sin();
+    }
+
+    @Override
+    public DoubleDoubleReal asin(DoubleDoubleReal value) {
+        return value.asin();
+    }
+
+    @Override
+    public DoubleDoubleReal sinh(DoubleDoubleReal value) {
+        return value.sinh();
+    }
+
+    @Override
+    public DoubleDoubleReal asinh(DoubleDoubleReal value) {
+        return value.asinh();
     }
 
     @Override
     public DoubleDoubleReal tan(DoubleDoubleReal value) {
-        return new DoubleDoubleReal(value.getDoubleDouble().tan());
+        return value.tan();
+    }
+
+    @Override
+    public DoubleDoubleReal atan(DoubleDoubleReal value) {
+        return value.atan();
+    }
+
+    @Override
+    public DoubleDoubleReal atan2(DoubleDoubleReal x, DoubleDoubleReal y) {
+        throw new NotImplementedException();
+    }
+
+    @Override
+    public DoubleDoubleReal tanh(DoubleDoubleReal value) {
+        return value.tanh();
+    }
+
+    @Override
+    public DoubleDoubleReal atanh(DoubleDoubleReal value) {
+        return value.atanh();
     }
 
     @Override
     public DoubleDoubleReal exp(DoubleDoubleReal value) {
-        return new DoubleDoubleReal(value.getDoubleDouble().exp());
+        return value.exp();
     }
 
     @Override
     public DoubleDoubleReal log(DoubleDoubleReal value) {
-        return new DoubleDoubleReal(value.getDoubleDouble().log());
+        return value.log();
     }
 
     @Override
-    public DoubleDoubleReal pow(DoubleDoubleReal value, DoubleDoubleReal i_y) {
-        return new DoubleDoubleReal(value.getDoubleDouble().pow(i_y.getDoubleDouble()));
+    public DoubleDoubleReal log10(DoubleDoubleReal value) {
+        return value.log10();
+    }
+
+    @Override
+    public DoubleDoubleReal flat(DoubleDoubleReal x) {
+        double xValue = x.doubleValue();
+        return new DoubleDoubleReal(new DoubleDouble(-xValue + (xValue + xValue) * randomGenerator.nextDouble()));
+    }
+
+    @Override
+    public DoubleDoubleReal mc(DoubleDoubleReal x, DoubleDoubleReal y) {
+        double min = Math.min(x.doubleValue() * (1 - y.doubleValue()),
+                x.doubleValue() * (1 + y.doubleValue()));
+        double max = Math.max(x.doubleValue() * (1 - y.doubleValue()),
+                x.doubleValue() * (1 + y.doubleValue()));
+        return new DoubleDoubleReal(
+                new DoubleDouble(min + (max + min) * randomGenerator.nextDouble()));
+    }
+
+    @Override
+    public DoubleDoubleReal rand(DoubleDoubleReal x) {
+        return new DoubleDoubleReal(new Random((long) x.getReal()).nextDouble());
+    }
+
+    @Override
+    public DoubleDoubleReal random(DoubleDoubleReal x) {
+        return new DoubleDoubleReal(new Random((long) x.getReal()).nextDouble());
+    }
+
+    @Override
+    public DoubleDoubleReal gauss(DoubleDoubleReal x) {
+        return new DoubleDoubleReal(randomGenerator.nextGaussian()*x.doubleValue());
+    }
+
+    @Override
+    public DoubleDoubleReal sgn(DoubleDoubleReal value) {
+        return value.sgn();
+    }
+
+    @Override
+    public DoubleDoubleReal ifx(DoubleDoubleReal x, DoubleDoubleReal y, DoubleDoubleReal z) {
+        return x.compareTo(DoubleDoubleReal.HALF) > 0 ? y : z;
+    }
+
+    @Override
+    public DoubleDoubleReal buf(DoubleDoubleReal x) {
+        return x.compareTo(DoubleDoubleReal.HALF) > 0 ? one() : zero();
+    }
+
+    @Override
+    public DoubleDoubleReal inv(DoubleDoubleReal x) {
+        return x.compareTo(DoubleDoubleReal.HALF) > 0 ? zero() : one();
+    }
+
+    @Override
+    public DoubleDoubleReal u(DoubleDoubleReal x) {
+        return x.getDoubleDouble().compareTo(DoubleDouble.ZERO) > 0 ? one() : zero();
+    }
+
+    @Override
+    public DoubleDoubleReal uramp(DoubleDoubleReal x) {
+        return x.getDoubleDouble().compareTo(DoubleDouble.ZERO) > 0 ? new DoubleDoubleReal(
+                new DoubleDouble(x.getDoubleDouble())) : zero();
+    }
+
+    @Override
+    public DoubleDoubleReal pow(DoubleDoubleReal value, DoubleDoubleReal n) {
+        return value.pow(n);
+    }
+
+    @Override
+    public DoubleDoubleReal pwr(DoubleDoubleReal value, DoubleDoubleReal n) {
+        return value.pwr(n);
+    }
+
+    @Override
+    public DoubleDoubleReal pwrs(DoubleDoubleReal value, DoubleDoubleReal n) {
+        return value.pwrs(n);
     }
 
     @Override
     public DoubleDoubleReal sqrt(DoubleDoubleReal value) {
-        return new DoubleDoubleReal(value.getDoubleDouble().sqrt());
+        return value.sqrt();
     }
 
     @Override
     public DoubleDoubleReal square(DoubleDoubleReal value) {
-        return new DoubleDoubleReal(value.getDoubleDouble().pow(2));
+        return value.square();
+    }
+
+    @Override
+    public DoubleDoubleReal hypot(DoubleDoubleReal x, DoubleDoubleReal y) {
+        return x.pow(2).plus(y.pow(2)).sqrt();
     }
 
     @Override
     public DoubleDoubleReal floor(DoubleDoubleReal value) {
         return value.floor();
+    }
+
+    @Override
+    public DoubleDoubleReal ceil(DoubleDoubleReal value) {
+        return value.ceil();
+    }
+
+    @Override
+    public DoubleDoubleReal round(DoubleDoubleReal value) {
+        return value.round();
     }
 
 }
