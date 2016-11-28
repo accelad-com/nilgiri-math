@@ -6,7 +6,6 @@ public class DoubleReal implements RealNumber<DoubleReal> {
 
     public DoubleReal() {
         this(0.0);
-
     }
 
     public DoubleReal(double x) {
@@ -33,7 +32,6 @@ public class DoubleReal implements RealNumber<DoubleReal> {
     public String toString() {
         return String.valueOf(x);
     }
-
 
     @Override
     public DoubleReal inverse() {
@@ -67,10 +65,29 @@ public class DoubleReal implements RealNumber<DoubleReal> {
         return new DoubleReal(x / rd.x);
     }
 
+    public DoubleReal pow(DoubleReal a) {
+        return pow(a.doubleValue());
+    }
+
     public DoubleReal floor() {
         return new DoubleReal(Math.floor(x));
     }
 
+    public DoubleReal ceil() {
+        return new DoubleReal(Math.ceil(x));
+    }
+
+    public DoubleReal round() {
+        return new DoubleReal(Math.round(x));
+    }
+
+    public DoubleReal abs() {
+        return new DoubleReal(Math.abs(x));
+    }
+
+    public DoubleReal sqrt() {
+        return new DoubleReal(Math.sqrt(x));
+    }
     // Operators for double
 
     public DoubleReal plus(double v) {
@@ -103,10 +120,85 @@ public class DoubleReal implements RealNumber<DoubleReal> {
         return new DoubleReal(x * n);
     }
 
-
     @Override
     public double getReal() {
         return x;
+    }
+
+    public DoubleReal cos() {
+        return new DoubleReal(Math.cos(x));
+    }
+
+    public DoubleReal acos() {
+        return new DoubleReal(Math.acos(x));
+    }
+
+    public DoubleReal cosh() {
+        return new DoubleReal(Math.cosh(x));
+    }
+
+    public DoubleReal acosh() {
+        return new DoubleReal(Math.log(Math.sqrt(Math.pow(x, 2) - 1) + x));
+    }
+
+    public DoubleReal sin() {
+        return new DoubleReal(Math.sin(x));
+    }
+
+    public DoubleReal asin() {
+        return new DoubleReal(Math.asin(x));
+    }
+
+    public DoubleReal sinh() {
+        return new DoubleReal(Math.sinh(x));
+    }
+
+    public DoubleReal asinh() {
+        return new DoubleReal(Math.log(Math.sqrt(Math.pow(x, 2) + 1) + x));
+    }
+
+    public DoubleReal tan() {
+        return new DoubleReal(Math.tan(x));
+    }
+
+    public DoubleReal atan() {
+        return new DoubleReal(Math.atan(x));
+    }
+
+    public DoubleReal tanh() {
+        return new DoubleReal(Math.tanh(x));
+    }
+
+    public DoubleReal atanh() {
+        return new DoubleReal(Math.log((x + 1) / (1 - x)) * 0.5);
+    }
+
+    public DoubleReal exp() {
+        return new DoubleReal(Math.exp(x));
+    }
+
+    public DoubleReal log() {
+        return new DoubleReal(Math.log(x));
+    }
+
+    public DoubleReal log10() {
+        return new DoubleReal(Math.log10(x));
+    }
+
+    public DoubleReal sgn() {
+        return new DoubleReal(Math.signum(x));
+    }
+
+    public DoubleReal pwr(DoubleReal y) {
+        return new DoubleReal(Math.pow(Math.abs(x), y.doubleValue()));
+    }
+
+    public DoubleReal pwrs(DoubleReal y) {
+        return new DoubleReal(Math.pow(Math.abs(x), y.doubleValue()) * Math.signum(x));
+    }
+
+    public DoubleReal square() {
+        return new DoubleReal(x * x);
     }
 
     @Override
@@ -132,5 +224,4 @@ public class DoubleReal implements RealNumber<DoubleReal> {
             return false;
         return true;
     }
-
 }
