@@ -5,7 +5,7 @@
 
     <groupId>com.accelad</groupId>
     <artifactId>nilgiri-math</artifactId>
-    <version>1.13-SNAPSHOT</version>
+    <version>1.12-SNAPSHOT</version>
 
     <name>Nilgiri Math</name>
     <description>JAutoDiff</description>

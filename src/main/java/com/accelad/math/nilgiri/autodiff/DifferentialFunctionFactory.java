@@ -429,7 +429,7 @@ public class DifferentialFunctionFactory<X extends Field<X>> {
 
             @Override
             public DifferentialFunction<X> diff(Variable<X> i_v) {
-                return one().div(sqrt(one().minus(arg().pow(2))));
+                return one().div(one().minus(arg().pow(2)));
             }
 
             @Override
