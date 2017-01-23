@@ -1,6 +1,6 @@
 package com.accelad.math.nilgiri;
 
-import com.accelad.math.DoubleDouble;
+import com.accelad.math.doubledouble.DoubleDouble;
 import com.google.common.base.Objects;
 
 public class DoubleDoubleReal

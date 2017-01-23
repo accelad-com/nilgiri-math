@@ -2,7 +2,7 @@ package com.accelad.math.nilgiri;
 
 import org.apache.commons.math3.util.FastMath;
 
-import com.accelad.math.DoubleDouble;
+import com.accelad.math.doubledouble.DoubleDouble;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 

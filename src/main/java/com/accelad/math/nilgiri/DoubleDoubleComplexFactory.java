@@ -2,8 +2,6 @@ package com.accelad.math.nilgiri;
 
 import java.util.Random;
 
-import com.accelad.math.DoubleDouble;
-
 public class DoubleDoubleComplexFactory
         implements AbstractFactory<DoubleDoubleComplex> {
 

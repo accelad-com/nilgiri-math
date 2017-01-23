@@ -1,4 +1,4 @@
-package com.accelad.math;
+package com.accelad.math.doubledouble;
 
 import com.google.common.base.Objects;
 import com.google.common.math.DoubleMath;

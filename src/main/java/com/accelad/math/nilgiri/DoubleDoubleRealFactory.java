@@ -2,7 +2,7 @@ package com.accelad.math.nilgiri;
 
 import java.util.Random;
 
-import com.accelad.math.DoubleDouble;
+import com.accelad.math.doubledouble.DoubleDouble;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 

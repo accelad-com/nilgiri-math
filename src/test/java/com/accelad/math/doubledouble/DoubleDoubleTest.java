@@ -1,5 +1,6 @@
-package com.accelad.math;
+package com.accelad.math.doubledouble;
 
+import com.accelad.math.doubledouble.DoubleDouble;
 import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.Test;
