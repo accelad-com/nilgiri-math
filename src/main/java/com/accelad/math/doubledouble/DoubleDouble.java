@@ -45,19 +45,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     private static final String SCI_NOT_EXPONENT_CHAR = "E";
     private static final String SCI_NOT_ZERO = "0.0E0";
 
-    private static int magnitude(double x) {
-        final double xAbs = Math.abs(x);
-        final double xLog10 = Math.log(xAbs) / Math.log(10);
-        int xMag = (int) Math.floor(xLog10);
-
-        final double xApprox = Math.pow(10, xMag);
-        if (xApprox * 10 <= xAbs) {
-            xMag += 1;
-        }
-
-        return xMag;
-    }
-
     public static DoubleDouble valueOfString(String str) {
         int i = 0;
         final int strlen = str.length();
@@ -82,7 +69,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         // scan all digits and accumulate into an integral value
         // Keep track of the location of the decimal point (if any) to allow
         // scaling later
-        final DoubleDouble val = fromOneDouble(0.0);
+        DoubleDouble val = fromOneDouble(0.0);
 
         int numDigits = 0;
         int numBeforeDec = 0;
@@ -95,9 +82,9 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             i++;
             if (Character.isDigit(ch)) {
                 final double d = ch - '0';
-                val.selfMultiply(TEN);
+                val = val.innerMultiply(TEN);
                 // MD: need to optimize this
-                val.selfAdd(fromOneDouble(d));
+                val = val.innerAdd(fromOneDouble(d));
                 numDigits++;
                 continue;
             }
@@ -144,17 +131,8 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     }
 
-    private static String stringOfChar(char ch, int len) {
-        final StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < len; i++) {
-            buf.append(ch);
-        }
-        return buf.toString();
-    }
-
-    private double hi = 0.0;
-
-    private double lo = 0.0;
+    private final double hi;
+    private final double lo;
 
     private DoubleDouble(double hi, double lo) {
         this.hi = hi;
@@ -195,7 +173,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     }
 
     /*
-     * // experimental private DoubleDouble selfAdd(double yhi, double ylo) {
+     * // experimental private DoubleDouble innerAdd(double yhi, double ylo) {
      * double H, h, T, t, S, s, e, f; S = hi + yhi; T = lo + ylo; e = S - hi; f
      * = T - lo; s = S-e; t = T-f; s = (yhi-e)+(hi-s); t = (ylo-f)+(lo-t); e =
      * s+T; H = S+e; h = e+(S-H); e = t+h;
@@ -209,7 +187,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         if (isNaN()) {
             return this;
         }
-        return fromDoubleDouble(this).selfAdd(y);
+        return fromDoubleDouble(this).innerAdd(y);
     }
 
     public DoubleDouble asin() {
@@ -226,7 +204,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         if (this.equals(fromOneDouble(-1.0))) {
             return PI_2.negate();
         }
-        final DoubleDouble square = this.multiply(this);
+        final DoubleDouble square = multiply(this);
         DoubleDouble s = fromDoubleDouble(this);
         DoubleDouble sOld;
         DoubleDouble t = fromDoubleDouble(this);
@@ -340,12 +318,12 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
                     temp = temp.subtract(fromOneDouble(k));
                     temp = temp.divide(fromOneDouble(j));
                     r = r.multiply(temp);
-                } // for (j = 2; j <= k; j++)
+                }
                 temp = r.multiply(BN[k]);
                 s = s.subtract(temp);
-            } // for (k = 2; k <= m-1; k++)
+            }
             BN[m] = s;
-        } // for (m = 2; m <= n; m++)
+        }
         return BN[n];
     }
 
@@ -372,7 +350,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             // B2*n+1 = 0 for n = 1,2,3
             return fromOneDouble(0.0);
         }
-        final DoubleDouble bn[] = new DoubleDouble[n + 1];
+        DoubleDouble bn[] = new DoubleDouble[n + 1];
         bn[0] = fromOneDouble(1.0);
         if (n == 0) {
             return bn[0];
@@ -401,7 +379,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
                 r2 = r2.add(s);
             } while (s.ne(sOld));
             bn[m] = r1.multiply(r2);
-        } // for (m = 4; m <= n; m+=2)
+        }
         return bn[n];
     }
 
@@ -460,8 +438,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         DoubleDouble xs;
         DoubleDouble xg1;
         DoubleDouble xg2;
-        DoubleDouble xcs;
-        DoubleDouble xss;
         DoubleDouble xf;
         DoubleDouble xg;
         int i1;
@@ -470,10 +446,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         DoubleDouble var2;
 
         x2 = x.multiply(x);
-        if (x.isZero()) {
-            Ci = fromOneDouble(-1.0E300);
-            Si = fromOneDouble(0.0);
-        } else if (x.le(fromOneDouble(16.0))) {
+        if (x.le(fromOneDouble(16.0))) {
             xr = (fromOneDouble(-0.25)).multiply(x2);
             Ci = (el.add(x.log())).add(xr);
             for (k = 2; k <= 40; k++) {
@@ -484,7 +457,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
                 if ((xr.abs()).lt((Ci.abs()).multiply(fromOneDouble(EPS)))) {
                     break;
                 }
-            } // for (k = 2; k <= 40; k++)
+            }
             xr = fromDoubleDouble(x);
             Si = fromDoubleDouble(x);
             for (k = 1; k <= 40; k++) {
@@ -495,8 +468,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
                 if ((xr.abs()).lt((Si.abs()).multiply(fromOneDouble(EPS)))) {
                     return;
                 }
-            } // for (k = 1; k <= 40; k++)
-
+            }
         } // else if x <= 16
         else if (x.le(fromOneDouble(32.0))) {
             m = (((fromOneDouble(47.2)).add((fromOneDouble(0.82)).multiply(x)))
@@ -540,14 +512,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
                         .multiply(x);
                 xg2 = xg2.add(bj[k].multiply(xr));
             }
-            xcs = ((fromOneDouble(0.5)).multiply(x)).cos();
-            xss = ((fromOneDouble(0.5)).multiply(x)).sin();
-            Ci = (((el.add(x.log())).subtract((x.multiply(xss)).multiply(xg1)))
-                    .add(((fromOneDouble(2.0)).multiply(xcs)).multiply(xg2)))
-                    .subtract(((fromOneDouble(2.0)).multiply(xcs)).multiply(xcs));
-            Si = (((x.multiply(xcs)).multiply(xg1))
-                    .add(((fromOneDouble(2.0)).multiply(xss)).multiply(xg2)))
-                    .subtract(x.sin());
         } // else if x <= 32
         else {
             xr = fromOneDouble(1.0);
@@ -566,11 +530,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
                 xr = (((fromOneDouble(-2.0)).multiply(xr)).multiply(var1)).divide(x2);
                 xg = xg.add(xr);
             }
-            Ci = ((xf.multiply(x.sin())).divide(x)).subtract((xg.multiply(x.cos())).divide(x));
-            Si = (PI_2.subtract((xf.multiply(x.cos())).divide(x)))
-                    .subtract((xg.multiply(x.sin())).divide(x));
         }
-        return;
     }
 
     @Override
@@ -724,64 +684,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     }
 
-    private String extractSignificantDigits(boolean insertDecimalPoint, int[] magnitude) {
-        DoubleDouble y = this.abs();
-        // compute *correct* magnitude of y
-        int mag = magnitude(y.hi);
-        final DoubleDouble scale = TEN.pow(mag);
-        y = y.divide(scale);
-
-        // fix magnitude if off by one
-        if (y.gt(TEN)) {
-            y = y.divide(TEN);
-            mag += 1;
-        } else if (y.lt(ONE)) {
-            y = y.multiply(TEN);
-            mag -= 1;
-        }
-
-        final int decimalPointPos = mag + 1;
-        final StringBuilder buf = new StringBuilder();
-        final int numDigits = MAX_PRINT_DIGITS - 1;
-        for (int i = 0; i <= numDigits; i++) {
-            if (insertDecimalPoint && i == decimalPointPos) {
-                buf.append('.');
-            }
-            final int digit = (int) y.hi;
-
-            if (digit < 0) {
-                break;
-            }
-            boolean rebiasBy10 = false;
-            char digitChar;
-            if (digit > 9) {
-                // set flag to re-bias after next 10-shift
-                rebiasBy10 = true;
-                // output digit will end up being '9'
-                digitChar = '9';
-            } else {
-                digitChar = (char) ('0' + digit);
-            }
-            buf.append(digitChar);
-            y = y.subtract(fromOneDouble(digit).multiply(TEN));
-            if (rebiasBy10) {
-                y.selfAdd(TEN);
-            }
-
-            boolean continueExtractingDigits = true;
-
-            final int remMag = magnitude(y.hi);
-            if (remMag < 0 && Math.abs(remMag) >= (numDigits - i)) {
-                continueExtractingDigits = false;
-            }
-            if (!continueExtractingDigits) {
-                break;
-            }
-        }
-        magnitude[0] = mag;
-        return buf.toString();
-    }
-
     public DoubleDouble factorial(int fac) {
         DoubleDouble prod;
         if (fac < 0) {
@@ -823,23 +725,8 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return lo;
     }
 
-    private String getSpecialNumberString() {
-        if (isZero()) {
-            return "0.0";
-        }
-        if (isNaN()) {
-            return "NaN ";
-        }
-        return null;
-    }
-
     public boolean gt(DoubleDouble y) {
         return (hi > y.hi) || (hi == y.hi && lo > y.lo);
-    }
-
-    private void init(double hi, double lo) {
-        this.hi = hi;
-        this.lo = lo;
     }
 
     public int intValue() {
@@ -959,7 +846,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         if (y.isNaN()) {
             return y;
         }
-        return (fromDoubleDouble(this)).selfMultiply(y);
+        return innerMultiply(y);
     }
 
     public boolean ne(DoubleDouble y) {
@@ -975,9 +862,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     public DoubleDouble pow(DoubleDouble x) {
         boolean invert = false;
-        if (x.isNaN() || x.isInfinite()) {
-            return NaN;
-        } else if (isInfinite() || isNaN()) {
+        if (x.isNaN() || x.isInfinite() || isInfinite() || isNaN()) {
             return NaN;
         }
         if (x.isZero()) {
@@ -1032,7 +917,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             /* Use binary exponentiation */
             while (n > 0) {
                 if (n % 2 == 1) {
-                    s.selfMultiply(r);
+                    s = s.innerMultiply(r);
                 }
                 n /= 2;
                 if (n > 0) {
@@ -1079,7 +964,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return plus5.floor();
     }
 
-    private DoubleDouble selfAdd(DoubleDouble y) {
+    private DoubleDouble innerAdd(DoubleDouble y) {
         double bigH, h, bigT, t, bigS, s, e, f;
         bigS = hi + y.hi;
         bigT = lo + y.lo;
@@ -1094,12 +979,9 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         h = e + (bigS - bigH);
         e = t + h;
 
-        final double zhi = bigH + e;
-        final double zlo = e + (bigH - zhi);
-        hi = zhi;
-        lo = zlo;
-
-        return this;
+        double zhi = bigH + e;
+        double zlo = e + (bigH - zhi);
+        return fromTwoDouble(zhi, zlo);
     }
 
     /*------------------------------------------------------------
@@ -1107,7 +989,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
      *------------------------------------------------------------
      */
 
-    private DoubleDouble selfMultiply(DoubleDouble y) {
+    private DoubleDouble innerMultiply(DoubleDouble y) {
         double hx, tx, hy, ty, bigC, c;
         bigC = SPLIT * hi;
         hx = bigC - hi;
@@ -1122,9 +1004,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         final double zhi = bigC + c;
         hx = bigC - zhi;
         final double zlo = c + hx;
-        hi = zhi;
-        lo = zlo;
-        return this;
+        return fromTwoDouble(zhi, zlo);
     }
 
     public DoubleDouble si() {
@@ -1293,77 +1173,6 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             s = s.add(t);
         } while (s.ne(sOld));
         return s;
-    }
-
-    public String toSciNotation() {
-        // special case zero, to allow as
-        if (isZero()) {
-            return SCI_NOT_ZERO;
-        }
-
-        final String specialStr = getSpecialNumberString();
-        if (specialStr != null) {
-            return specialStr;
-        }
-
-        final int[] magnitude = new int[1];
-        final String digits = extractSignificantDigits(false, magnitude);
-        final String expStr = SCI_NOT_EXPONENT_CHAR + magnitude[0];
-
-        // should never have leading zeroes
-        // MD - is this correct? Or should we simply strip them if they are
-        // present?
-        if (digits.charAt(0) == '0') {
-            throw new IllegalStateException("Found leading zero: " + digits);
-        }
-
-        // add decimal point
-        String trailingDigits = "";
-        if (digits.length() > 1) {
-            trailingDigits = digits.substring(1);
-        }
-        final String digitsWithDecimal = digits.charAt(0) + "." + trailingDigits;
-
-        if (this.isNegative()) {
-            return "-" + digitsWithDecimal + expStr;
-        }
-        return digitsWithDecimal + expStr;
-    }
-
-    /*------------------------------------------------------------
-     *   Input
-     *------------------------------------------------------------
-     */
-
-    public String toStandardNotation() {
-        final String specialStr = getSpecialNumberString();
-        if (specialStr != null) {
-            return specialStr;
-        }
-
-        final int[] magnitude = new int[1];
-        final String sigDigits = extractSignificantDigits(true, magnitude);
-        final int decimalPointPos = magnitude[0] + 1;
-
-        String num = sigDigits;
-        // add a leading 0 if the decimal point is the first char
-        if (sigDigits.charAt(0) == '.') {
-            num = "0" + sigDigits;
-        } else if (decimalPointPos < 0) {
-            num = "0." + stringOfChar('0', -decimalPointPos) + sigDigits;
-        } else if (sigDigits.indexOf('.') == -1) {
-            // no point inserted - sig digits must be smaller than magnitude of
-            // number
-            // add zeroes to end to make number the correct size
-            final int numZeroes = decimalPointPos - sigDigits.length();
-            final String zeroes = stringOfChar('0', numZeroes);
-            num = sigDigits + zeroes + ".0";
-        }
-
-        if (this.isNegative()) {
-            return "-" + num;
-        }
-        return num;
     }
 
     @Override
