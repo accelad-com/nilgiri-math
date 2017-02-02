@@ -132,7 +132,7 @@ public class DoubleDoubleRealFactory implements AbstractFactory<DoubleDoubleReal
     @Override
     public DoubleDoubleReal flat(DoubleDoubleReal x) {
         double xValue = x.doubleValue();
-        return new DoubleDoubleReal(new DoubleDouble(-xValue + (xValue + xValue) * randomGenerator.nextDouble()));
+        return new DoubleDoubleReal(DoubleDouble.fromOneDouble(-xValue + (xValue + xValue) * randomGenerator.nextDouble()));
     }
 
     @Override
@@ -142,7 +142,7 @@ public class DoubleDoubleRealFactory implements AbstractFactory<DoubleDoubleReal
         double max = Math.max(x.doubleValue() * (1 - y.doubleValue()),
                 x.doubleValue() * (1 + y.doubleValue()));
         return new DoubleDoubleReal(
-                new DoubleDouble(min + (max + min) * randomGenerator.nextDouble()));
+                DoubleDouble.fromOneDouble(min + (max + min) * randomGenerator.nextDouble()));
     }
 
     @Override
@@ -188,7 +188,7 @@ public class DoubleDoubleRealFactory implements AbstractFactory<DoubleDoubleReal
     @Override
     public DoubleDoubleReal uramp(DoubleDoubleReal x) {
         return x.getDoubleDouble().compareTo(DoubleDouble.ZERO) > 0 ? new DoubleDoubleReal(
-                new DoubleDouble(x.getDoubleDouble())) : zero();
+                DoubleDouble.fromDoubleDouble(x.getDoubleDouble())) : zero();
     }
 
     @Override

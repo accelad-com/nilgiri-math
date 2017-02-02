@@ -18,11 +18,11 @@ public class DoubleDoubleReal
     }
 
     public DoubleDoubleReal(double value) {
-        doubleDouble = new DoubleDouble(value);
+        doubleDouble = DoubleDouble.fromOneDouble(value);
     }
 
     public DoubleDoubleReal(String doubleString) {
-        doubleDouble = new DoubleDouble(doubleString);
+        doubleDouble = DoubleDouble.valueOfString(doubleString);
     }
 
     public DoubleDoubleReal(DoubleDouble bigDecimal) {
@@ -30,7 +30,7 @@ public class DoubleDoubleReal
     }
 
     public void set(double value) {
-        doubleDouble = new DoubleDouble(value);
+        doubleDouble = DoubleDouble.fromOneDouble(value);
     }
 
     public double doubleValue() {
@@ -92,7 +92,7 @@ public class DoubleDoubleReal
 
     @Override
     public DoubleDoubleReal mul(long value) {
-        return new DoubleDoubleReal(doubleDouble.multiply(new DoubleDouble(value)));
+        return new DoubleDoubleReal(doubleDouble.multiply(DoubleDouble.fromOneDouble(value)));
     }
 
     @Override
