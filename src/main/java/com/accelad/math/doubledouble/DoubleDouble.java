@@ -7,6 +7,10 @@ import java.io.Serializable;
 
 public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDouble>, Cloneable {
 
+    private static final DoubleDoubleCache<DoubleDouble> EXP_CACHE = new DoubleDoubleCache<>();
+    private static final DoubleDoubleCache<CacheMap<Integer, DoubleDouble>> POW_INTEGER_CACHE = new DoubleDoubleCache<>();
+    private static final DoubleDoubleCache<DoubleDoubleCache<DoubleDouble>> POW_DOUBLE_DOUBLE_CACHE = new DoubleDoubleCache<>();
+
     private static final long serialVersionUID = 1L;
 
     public static final DoubleDouble ZERO = fromOneDouble(0.0);
@@ -34,18 +38,16 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             Double.NEGATIVE_INFINITY);
 
     public static final double EPS = 1.23259516440783e-32; /* = 2^-106 */
-
     private static final double SPLIT = 134217729.0D; // 2^27+1, for IEEE double
 
-    private static final int MAX_PRINT_DIGITS = 32;
+    public static final DoubleDouble ONE = fromOneDouble(1.0);
+    public static final DoubleDouble MINUS_ONE = fromOneDouble(-1.0);
+    public static final DoubleDouble TWO = fromOneDouble(2.0);
     private static final DoubleDouble TEN = fromOneDouble(10.0);
     private static final DoubleDouble LOG_TEN = TEN.log();
-    public static final DoubleDouble ONE = fromOneDouble(1.0);
-    public static final DoubleDouble TWO = fromOneDouble(2.0);
-    private static final String SCI_NOT_EXPONENT_CHAR = "E";
-    private static final String SCI_NOT_ZERO = "0.0E0";
+    public static final int POW_INT_CACHE_SIZE_LIMIT = 100000;
 
-    public static DoubleDouble valueOfString(String str) {
+    public static DoubleDouble valueOf(String str) {
         int i = 0;
         final int strlen = str.length();
 
@@ -69,7 +71,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         // scan all digits and accumulate into an integral value
         // Keep track of the location of the decimal point (if any) to allow
         // scaling later
-        DoubleDouble val = fromOneDouble(0.0);
+        DoubleDouble val = ZERO;
 
         int numDigits = 0;
         int numBeforeDec = 0;
@@ -82,9 +84,9 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             i++;
             if (Character.isDigit(ch)) {
                 final double d = ch - '0';
-                val = val.innerMultiply(TEN);
+                val = val.multiply(TEN);
                 // MD: need to optimize this
-                val = val.innerAdd(fromOneDouble(d));
+                val = val.add(fromOneDouble(d));
                 numDigits++;
                 continue;
             }
@@ -131,20 +133,22 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     }
 
+    private final boolean isNaN;
     private final double hi;
     private final double lo;
 
     private DoubleDouble(double hi, double lo) {
+        this.isNaN = Double.isNaN(hi);
         this.hi = hi;
         this.lo = lo;
     }
 
-    public static DoubleDouble fromTwoDouble(double hi, double lo){
+    public static DoubleDouble fromTwoDouble(double hi, double lo) {
         return new DoubleDouble(hi, lo);
     }
 
-    public static DoubleDouble fromOneDouble(double x){
-        return fromTwoDouble(x,0.0);
+    public static DoubleDouble fromOneDouble(double x) {
+        return fromTwoDouble(x, 0.0);
     }
 
     public static DoubleDouble fromDoubleDouble(DoubleDouble dd) {
@@ -152,7 +156,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     }
 
     public DoubleDouble abs() {
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
         if (isNegative()) {
@@ -162,10 +166,10 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     }
 
     public DoubleDouble acos() {
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
-        if ((this.abs()).gt(fromOneDouble(1.0))) {
+        if ((this.abs()).gt(ONE)) {
             return NaN;
         }
         final DoubleDouble s = PI_2.subtract(this.asin());
@@ -183,25 +187,18 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
      * return this; }
      */
 
-    public DoubleDouble add(DoubleDouble y) {
-        if (isNaN()) {
-            return this;
-        }
-        return fromDoubleDouble(this).innerAdd(y);
-    }
-
     public DoubleDouble asin() {
         // Return the arcsine of a DoubleDouble number
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
-        if ((this.abs()).gt(fromOneDouble(1.0))) {
+        if ((this.abs()).gt(ONE)) {
             return NaN;
         }
-        if (this.equals(fromOneDouble(1.0))) {
+        if (this.equals(ONE)) {
             return PI_2;
         }
-        if (this.equals(fromOneDouble(-1.0))) {
+        if (this.equals(MINUS_ONE)) {
             return PI_2.negate();
         }
         final DoubleDouble square = multiply(this);
@@ -227,16 +224,16 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     }
 
     public DoubleDouble atan() {
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
         DoubleDouble s;
         DoubleDouble sOld;
-        if (this.equals(fromOneDouble(1.0))) {
-            s = PI_2.divide(fromOneDouble(2.0));
-        } else if (this.equals(fromOneDouble(-1.0))) {
+        if (this.equals(ONE)) {
+            s = PI_2.divide(TWO);
+        } else if (this.equals(MINUS_ONE)) {
             s = PI_2.divide(fromOneDouble(-2.0));
-        } else if (this.abs().lt(fromOneDouble(1.0))) {
+        } else if (this.abs().lt(ONE)) {
             final DoubleDouble msquare = (this.multiply(this)).negate();
             s = fromDoubleDouble(this);
 
@@ -296,10 +293,10 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             return NaN;
         } else if ((n >= 3) && (((n - 1) % 2) == 0)) {
             // B2*n+1 = 0 for n = 1,2,3
-            return fromOneDouble(0.0);
+            return ZERO;
         }
         final DoubleDouble BN[] = new DoubleDouble[n + 1];
-        BN[0] = fromOneDouble(1.0);
+        BN[0] = ONE;
         if (n == 0) {
             return BN[0];
         }
@@ -308,11 +305,11 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             return BN[1];
         }
         for (m = 2; m <= n; m++) {
-            s = (fromOneDouble(m)).add(fromOneDouble(1.0));
+            s = (fromOneDouble(m)).add(ONE);
             s = s.reciprocal();
-            s = (fromOneDouble(0.5)).subtract(s);
+            s = (HALF).subtract(s);
             for (k = 2; k <= m - 1; k++) {
-                r = fromOneDouble(1.0);
+                r = ONE;
                 for (j = 2; j <= k; j++) {
                     temp = (fromOneDouble(j)).add(fromOneDouble(m));
                     temp = temp.subtract(fromOneDouble(k));
@@ -348,10 +345,10 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             return NaN;
         } else if ((n >= 3) && (((n - 1) % 2) == 0)) {
             // B2*n+1 = 0 for n = 1,2,3
-            return fromOneDouble(0.0);
+            return ZERO;
         }
         DoubleDouble bn[] = new DoubleDouble[n + 1];
-        bn[0] = fromOneDouble(1.0);
+        bn[0] = ONE;
         if (n == 0) {
             return bn[0];
         }
@@ -359,22 +356,22 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         if (n == 1) {
             return bn[1];
         }
-        bn[2] = (fromOneDouble(1.0)).divide(fromOneDouble(6.0));
+        bn[2] = (ONE).divide(fromOneDouble(6.0));
         if (n == 2) {
             return bn[2];
         }
-        r1 = ((fromOneDouble(1.0)).divide(PI)).sqr();
+        r1 = ((ONE).divide(PI)).sqr();
         twoPISqr = TWO_PI.multiply(TWO_PI);
         for (int m = 4; m <= n; m += 2) {
             temp = (fromOneDouble(m)).divide(twoPISqr);
             temp = (fromOneDouble(m - 1d)).multiply(temp);
             r1 = (r1.multiply(temp)).negate();
-            r2 = fromOneDouble(1.0);
-            s = fromOneDouble(1.0);
+            r2 = ONE;
+            s = ONE;
             k = 2;
             do {
                 sOld = s;
-                s = (fromOneDouble(1.0)).divide(fromOneDouble(k++));
+                s = (ONE).divide(fromOneDouble(k++));
                 s = s.pow(m);
                 r2 = r2.add(s);
             } while (s.ne(sOld));
@@ -395,7 +392,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
      */
 
     public DoubleDouble ceil() {
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
         final double fhi = Math.ceil(hi);
@@ -409,13 +406,13 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     }
 
     public DoubleDouble round() {
-        return this.add(fromOneDouble(0.5)).floor();
+        return this.add(HALF).floor();
     }
 
     public DoubleDouble Ci() {
         final DoubleDouble x = fromDoubleDouble(this);
-        final DoubleDouble Ci = fromOneDouble(0.0);
-        final DoubleDouble Si = fromOneDouble(0.0);
+        final DoubleDouble Ci = ZERO;
+        final DoubleDouble Si = ZERO;
         cisia(x, Ci, Si);
         return Ci;
     }
@@ -450,9 +447,8 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             xr = (fromOneDouble(-0.25)).multiply(x2);
             Ci = (el.add(x.log())).add(xr);
             for (k = 2; k <= 40; k++) {
-                xr = ((((fromOneDouble(-0.5)).multiply(xr))
-                        .multiply(fromOneDouble(k - 1)))
-                        .divide(fromOneDouble(k * k * (2 * k - 1)))).multiply(x2);
+                xr = ((((fromOneDouble(-0.5)).multiply(xr)).multiply(fromOneDouble(k - 1))).divide(
+                        fromOneDouble(k * k * (2 * k - 1)))).multiply(x2);
                 Ci = Ci.add(xr);
                 if ((xr.abs()).lt((Ci.abs()).multiply(fromOneDouble(EPS)))) {
                     break;
@@ -461,9 +457,9 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             xr = fromDoubleDouble(x);
             Si = fromDoubleDouble(x);
             for (k = 1; k <= 40; k++) {
-                xr = (((((fromOneDouble(-0.5)).multiply(xr))
-                        .multiply(fromOneDouble(2 * k - 1))).divide(fromOneDouble(k)))
-                        .divide(fromOneDouble(4 * k * k + 4 * k + 1))).multiply(x2);
+                xr = (((((fromOneDouble(-0.5)).multiply(xr)).multiply(
+                        fromOneDouble(2 * k - 1))).divide(fromOneDouble(k))).divide(
+                        fromOneDouble(4 * k * k + 4 * k + 1))).multiply(x2);
                 Si = Si.add(xr);
                 if ((xr.abs()).lt((Si.abs()).multiply(fromOneDouble(EPS)))) {
                     return;
@@ -471,51 +467,50 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             }
         } // else if x <= 16
         else if (x.le(fromOneDouble(32.0))) {
-            m = (((fromOneDouble(47.2)).add((fromOneDouble(0.82)).multiply(x)))
-                    .trunc()).intValue();
-            xa1 = fromOneDouble(0.0);
+            m = (((fromOneDouble(47.2)).add((fromOneDouble(0.82)).multiply(x))).trunc()).intValue();
+            xa1 = ZERO;
             xa0 = fromOneDouble(1.0E-100);
             for (k = m; k >= 1; k--) {
-                xa = ((((fromOneDouble(4.0)).multiply(fromOneDouble(k)))
-                        .multiply(xa0)).divide(x)).subtract(xa1);
+                xa = ((((fromOneDouble(4.0)).multiply(fromOneDouble(k))).multiply(xa0)).divide(
+                        x)).subtract(xa1);
                 bj[k - 1] = fromDoubleDouble(xa);
                 xa1 = fromDoubleDouble(xa0);
                 xa0 = fromDoubleDouble(xa);
             } // for (k = m; k >= 1; k--)
             xs = fromDoubleDouble(bj[0]);
             for (k = 2; k <= m; k += 2) {
-                xs = xs.add((fromOneDouble(2.0)).multiply(bj[k]));
+                xs = xs.add((TWO).multiply(bj[k]));
             }
             bj[0] = bj[0].divide(xs);
             for (k = 1; k <= m; k++) {
                 bj[k] = bj[k].divide(xs);
             }
-            xr = fromOneDouble(1.0);
+            xr = ONE;
             xg1 = fromDoubleDouble(bj[0]);
             for (k = 1; k <= m; k++) {
                 i1 = (2 * k - 1) * (2 * k - 1);
                 var1 = fromOneDouble(i1);
                 i2 = k * (2 * k + 1) * (2 * k + 1);
                 var2 = fromOneDouble(i2);
-                xr = ((((fromOneDouble(0.25)).multiply(xr)).multiply(var1)).divide(var2))
-                        .multiply(x);
+                xr = ((((fromOneDouble(0.25)).multiply(xr)).multiply(var1)).divide(var2)).multiply(
+                        x);
                 xg1 = xg1.add(bj[k].multiply(xr));
             }
-            xr = fromOneDouble(1.0);
+            xr = ONE;
             xg2 = fromDoubleDouble(bj[0]);
             for (k = 1; k <= m; k++) {
                 i1 = (2 * k - 3) * (2 * k - 3);
                 var1 = fromOneDouble(i1);
                 i2 = k * (2 * k - 1) * (2 * k - 1);
                 var2 = fromOneDouble(i2);
-                xr = ((((fromOneDouble(0.25)).multiply(xr)).multiply(var1)).divide(var2))
-                        .multiply(x);
+                xr = ((((fromOneDouble(0.25)).multiply(xr)).multiply(var1)).divide(var2)).multiply(
+                        x);
                 xg2 = xg2.add(bj[k].multiply(xr));
             }
         } // else if x <= 32
         else {
-            xr = fromOneDouble(1.0);
-            xf = fromOneDouble(1.0);
+            xr = ONE;
+            xf = ONE;
             for (k = 1; k <= 9; k++) {
                 i1 = k * (2 * k - 1);
                 var1 = fromOneDouble(i1);
@@ -554,7 +549,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     public DoubleDouble cos() {
         boolean negate = false;
         // Return the cosine of a DoubleDouble number
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
         DoubleDouble twoPIFullTimes;
@@ -573,9 +568,9 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             negate = true;
         }
         final DoubleDouble msquare = (twoPIremainder.multiply(twoPIremainder)).negate();
-        DoubleDouble s = fromOneDouble(1.0);
+        DoubleDouble s = ONE;
         DoubleDouble sOld;
-        DoubleDouble t = fromOneDouble(1.0);
+        DoubleDouble t = ONE;
         double n = 0.0;
         do {
             n += 1.0;
@@ -594,13 +589,13 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     public DoubleDouble cosh() {
         // Return the cosh of a DoubleDouble number
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
         final DoubleDouble square = this.multiply(this);
-        DoubleDouble s = fromOneDouble(1.0);
+        DoubleDouble s = ONE;
         DoubleDouble sOld;
-        DoubleDouble t = fromOneDouble(1.0);
+        DoubleDouble t = ONE;
         double n = 0.0;
         do {
             n += 1.0;
@@ -643,10 +638,10 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return "DD<" + hi + ", " + lo + ">";
     }
 
-    public DoubleDouble exp() {
+    private DoubleDouble innerExp() {
         boolean invert = false;
         // Return the exponential of a DoubleDouble number
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
 
@@ -659,13 +654,13 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         }
 
         DoubleDouble x = this;
-        if (x.lt(fromOneDouble(0.0))) {
+        if (x.lt(ZERO)) {
             // Much greater precision if all numbers in the series have the same
             // sign.
             x = x.negate();
             invert = true;
         }
-        DoubleDouble s = (fromOneDouble(1.0)).add(x);
+        DoubleDouble s = ONE.add(x);
         DoubleDouble sOld;
         DoubleDouble t = fromDoubleDouble(x);
         double n = 1.0;
@@ -690,7 +685,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             return NaN;
         }
         if ((fac >= 0) && (fac <= 1)) {
-            return fromOneDouble(1.0);
+            return ONE;
         }
         prod = fromOneDouble(fac--);
         while (fac > 1) {
@@ -700,7 +695,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     }
 
     public DoubleDouble floor() {
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
         final double fhi = Math.floor(hi);
@@ -738,7 +733,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     }
 
     public boolean isNaN() {
-        return Double.isNaN(hi);
+        return isNaN;
     }
 
     public boolean isNegative() {
@@ -754,8 +749,8 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     }
 
     public boolean isInteger() {
-        return ((hi == Math.floor(hi)) && !Double.isInfinite(hi)) && ((lo == Math
-                .floor(lo)) && !Double.isInfinite(lo));
+        return ((hi == Math.floor(hi)) && !Double.isInfinite(hi)) && ((lo == Math.floor(
+                lo)) && !Double.isInfinite(lo));
     }
     /*------------------------------------------------------------
      *   Conversion Functions
@@ -768,7 +763,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     public DoubleDouble log() {
         // Return the natural log of a DoubleDouble number
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
         if (isZero()) {
@@ -790,11 +785,11 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             intPart--;
         }
 
-        final DoubleDouble num = number.subtract(fromOneDouble(1.0));
-        final DoubleDouble denom = number.add(fromOneDouble(1.0));
+        final DoubleDouble num = number.subtract(ONE);
+        final DoubleDouble denom = number.add(ONE);
         final DoubleDouble ratio = num.divide(denom);
         final DoubleDouble ratioSquare = ratio.multiply(ratio);
-        DoubleDouble s = fromOneDouble(2.0).multiply(ratio);
+        DoubleDouble s = TWO.multiply(ratio);
         DoubleDouble sOld;
         DoubleDouble t = fromDoubleDouble(s);
         DoubleDouble w;
@@ -839,30 +834,26 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         }
     }
 
-    public DoubleDouble multiply(DoubleDouble y) {
-        if (isNaN()) {
-            return this;
-        }
-        if (y.isNaN()) {
-            return y;
-        }
-        return innerMultiply(y);
-    }
-
     public boolean ne(DoubleDouble y) {
         return hi != y.hi || lo != y.lo;
     }
 
     public DoubleDouble negate() {
-        if (isNaN()) {
+        if (isNaN) {
             return this;
         }
         return fromTwoDouble(-hi, -lo);
     }
 
     public DoubleDouble pow(DoubleDouble x) {
+        DoubleDoubleCache<DoubleDouble> map = POW_DOUBLE_DOUBLE_CACHE.get(hi, lo,
+                DoubleDoubleCache::new);
+        return map.get(hi, lo, () -> innerPow(x));
+    }
+
+    private DoubleDouble innerPow(DoubleDouble x) {
         boolean invert = false;
-        if (x.isNaN() || x.isInfinite() || isInfinite() || isNaN()) {
+        if (x.isNaN || x.isInfinite() || isInfinite() || isNaN) {
             return NaN;
         }
         if (x.isZero()) {
@@ -905,19 +896,25 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     }
 
     public DoubleDouble pow(int exp) {
+        CacheMap<Integer, DoubleDouble> cacheMap = POW_INTEGER_CACHE.get(hi, lo,
+                () -> new CacheMap<>(POW_INT_CACHE_SIZE_LIMIT));
+        return cacheMap.get(exp, () -> innerPow(exp));
+    }
+
+    private DoubleDouble innerPow(int exp) {
         if (exp == 0.0) {
-            return fromOneDouble(1.0);
+            return ONE;
         }
 
         DoubleDouble r = fromDoubleDouble(this);
-        DoubleDouble s = fromOneDouble(1.0);
+        DoubleDouble s = ONE;
         int n = Math.abs(exp);
 
         if (n > 1) {
             /* Use binary exponentiation */
             while (n > 0) {
                 if (n % 2 == 1) {
-                    s = s.innerMultiply(r);
+                    s = s.multiply(r);
                 }
                 n /= 2;
                 if (n > 0) {
@@ -956,15 +953,15 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     }
 
     public DoubleDouble rint() {
-        if (isNaN()) {
+        if (isNaN) {
             return this;
         }
         // may not be 100% correct
-        final DoubleDouble plus5 = this.add(fromOneDouble(0.5));
+        final DoubleDouble plus5 = this.add(HALF);
         return plus5.floor();
     }
 
-    private DoubleDouble innerAdd(DoubleDouble y) {
+    public DoubleDouble add(DoubleDouble y) {
         double bigH, h, bigT, t, bigS, s, e, f;
         bigS = hi + y.hi;
         bigT = lo + y.lo;
@@ -989,7 +986,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
      *------------------------------------------------------------
      */
 
-    private DoubleDouble innerMultiply(DoubleDouble y) {
+    public DoubleDouble multiply(DoubleDouble y) {
         double hx, tx, hy, ty, bigC, c;
         bigC = SPLIT * hi;
         hx = bigC - hi;
@@ -1009,8 +1006,8 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     public DoubleDouble si() {
         final DoubleDouble x = fromDoubleDouble(this);
-        final DoubleDouble ci = fromOneDouble(0.0);
-        final DoubleDouble si = fromOneDouble(0.0);
+        final DoubleDouble ci = ZERO;
+        final DoubleDouble si = ZERO;
         cisia(x, ci, si);
         return si;
     }
@@ -1028,7 +1025,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     public DoubleDouble sin() {
         boolean negate = false;
         // Return the sine of a DoubleDouble number
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
         DoubleDouble twoPIFullTimes;
@@ -1068,7 +1065,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     public DoubleDouble sinh() {
         // Return the sinh of a DoubleDouble number
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
         final DoubleDouble square = this.multiply(this);
@@ -1104,7 +1101,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
          */
 
         if (isZero()) {
-            return fromOneDouble(0.0);
+            return ZERO;
         }
 
         if (isNegative()) {
@@ -1122,7 +1119,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     }
 
     public DoubleDouble subtract(DoubleDouble y) {
-        if (isNaN()) {
+        if (isNaN) {
             return this;
         }
         return add(y.negate());
@@ -1130,7 +1127,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     public DoubleDouble tan() {
         // Return the tangent of a DoubleDouble number
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
         DoubleDouble piFullTimes;
@@ -1163,8 +1160,8 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             n++;
             twon = 2 * n;
             t = t.divide(factorial(twon));
-            twotwon = (fromOneDouble(2.0)).pow(twon);
-            twotwonm1 = twotwon.subtract(fromOneDouble(1.0));
+            twotwon = (TWO).pow(twon);
+            twotwonm1 = twotwon.subtract(ONE);
             t = t.multiply(twotwon);
             t = t.multiply(twotwonm1);
             t = t.multiply(BernoulliB(n));
@@ -1181,7 +1178,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     }
 
     public DoubleDouble trunc() {
-        if (isNaN()) {
+        if (isNaN) {
             return NaN;
         }
         if (isPositive()) {
@@ -1200,9 +1197,13 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     public boolean equals(Object object) {
         if (object instanceof DoubleDouble) {
             DoubleDouble that = (DoubleDouble) object;
-            return DoubleMath.fuzzyEquals(hi, that.hi, 1E-12) && DoubleMath
-                    .fuzzyEquals(lo, that.lo, 1E-12);
+            return DoubleMath.fuzzyEquals(hi, that.hi, 1E-12) && DoubleMath.fuzzyEquals(lo, that.lo,
+                    1E-12);
         }
         return false;
+    }
+
+    public DoubleDouble exp() {
+        return EXP_CACHE.get(hi, lo, this::innerExp);
     }
 }
