@@ -7,8 +7,10 @@ import java.io.Serializable;
 
 public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDouble>, Cloneable {
 
+
     private static final DoubleDoubleCache<DoubleDouble> EXP_CACHE = new DoubleDoubleCache<>();
     private static final DoubleDoubleCache<CacheMap<Integer, DoubleDouble>> POW_INTEGER_CACHE = new DoubleDoubleCache<>();
+    private static final int POW_INT_CACHE_SIZE_LIMIT = 100000;
     private static final DoubleDoubleCache<DoubleDoubleCache<DoubleDouble>> POW_DOUBLE_DOUBLE_CACHE = new DoubleDoubleCache<>();
 
     private static final long serialVersionUID = 1L;
@@ -45,9 +47,8 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     public static final DoubleDouble TWO = fromOneDouble(2.0);
     private static final DoubleDouble TEN = fromOneDouble(10.0);
     private static final DoubleDouble LOG_TEN = TEN.log();
-    public static final int POW_INT_CACHE_SIZE_LIMIT = 100000;
 
-    public static DoubleDouble valueOf(String str) {
+    public static DoubleDouble fromString(String str) {
         int i = 0;
         final int strlen = str.length();
 

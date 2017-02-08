@@ -1,9 +1,8 @@
 package com.accelad.math.doubledouble;
 
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,7 +29,7 @@ public class DoubleDoubleCacheTest {
     public void should_return_the_value_provided_by_the_supplier_on_first_get() {
         double firstGet = doubleDoubleCacheMap.get(HI_A, LO_A, () -> RESULT_A);
 
-        Assert.assertThat(firstGet, is(RESULT_A));
+        assertTrue(firstGet == RESULT_A);
     }
 
     @Test
@@ -47,15 +46,6 @@ public class DoubleDoubleCacheTest {
         doubleDoubleCacheMap.get(HI_A, LO_A, () -> RESULT_A);
         double secondGet = doubleDoubleCacheMap.get(HI_A, LO_A, () -> RESULT_B);
 
-        Assert.assertThat(secondGet, is(RESULT_A));
-    }
-
-    @Test
-    public void should_return_the_value_provided_by_the_supplier_when_get_is_called_for_another_DoubleDouble() {
-        doubleDoubleCacheMap.get(HI_A, LO_A, () -> RESULT_A);
-        double resultForTheOtherDoubleDouble = doubleDoubleCacheMap.get(HI_B, LO_B, () -> RESULT_B);
-        doubleDoubleCacheMap.get(HI_C, LO_C, () -> RESULT_C);
-
-        Assert.assertThat(resultForTheOtherDoubleDouble, is(RESULT_B));
+        assertTrue(secondGet == RESULT_A);
     }
 }

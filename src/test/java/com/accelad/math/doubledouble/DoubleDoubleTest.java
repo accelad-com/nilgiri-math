@@ -14,37 +14,37 @@ public class DoubleDoubleTest {
 
     @Test
     public void test1() throws Exception {
-        DoubleDouble dd = DoubleDouble.valueOf("1");
+        DoubleDouble dd = DoubleDouble.fromString("1");
         Assert.assertEquals(1d, dd.doubleValue(), 1e-12);
     }
 
     @Test
     public void test2() throws Exception {
-        DoubleDouble dd = DoubleDouble.valueOf("1.0");
+        DoubleDouble dd = DoubleDouble.fromString("1.0");
         Assert.assertEquals(1d, dd.doubleValue(), 1e-12);
     }
 
     @Test
     public void test3() throws Exception {
-        DoubleDouble dd = DoubleDouble.valueOf("-1.0");
+        DoubleDouble dd = DoubleDouble.fromString("-1.0");
         Assert.assertEquals(-1d, dd.doubleValue(), 1e-12);
     }
 
     @Test
     public void test4() throws Exception {
-        DoubleDouble dd = DoubleDouble.valueOf("10");
+        DoubleDouble dd = DoubleDouble.fromString("10");
         Assert.assertEquals(10d, dd.doubleValue(), 1e-12);
     }
 
     @Test
     public void test5() throws Exception {
-        DoubleDouble dd = DoubleDouble.valueOf("-10");
+        DoubleDouble dd = DoubleDouble.fromString("-10");
         Assert.assertEquals(-10d, dd.doubleValue(), 1e-12);
     }
 
     @Test
     public void test6() throws Exception {
-        DoubleDouble dd = DoubleDouble.valueOf("-10");
+        DoubleDouble dd = DoubleDouble.fromString("-10");
         Assert.assertEquals(-10d, dd.doubleValue(), 1e-12);
     }
 
@@ -91,7 +91,7 @@ public class DoubleDoubleTest {
                 .build();
 
         for (Entry<String, DoubleDouble> entry : testData.entrySet()) {
-            DoubleDouble actual = DoubleDouble.valueOf(entry.getKey());
+            DoubleDouble actual = DoubleDouble.fromString(entry.getKey());
             DoubleDouble expected = entry.getValue();
             String message = entry.getKey() + " is not equal to " + entry.getValue();
             assertEquals(message, expected, actual);
@@ -108,7 +108,7 @@ public class DoubleDoubleTest {
         DoubleDouble array[] = new DoubleDouble[size];
         long startTime = getTime();
         for (int i = 0; i < size; i++) {
-            array[i] = DoubleDouble.valueOf(strArray[i]);
+            array[i] = DoubleDouble.fromString(strArray[i]);
         }
         long endTime = getTime();
         long elapsedTimeInMillis = endTime - startTime;

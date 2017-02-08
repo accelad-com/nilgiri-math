@@ -22,7 +22,7 @@ public class DoubleDoubleReal
     }
 
     public DoubleDoubleReal(String doubleString) {
-        doubleDouble = DoubleDouble.valueOf(doubleString);
+        doubleDouble = DoubleDouble.fromString(doubleString);
     }
 
     public DoubleDoubleReal(DoubleDouble bigDecimal) {
