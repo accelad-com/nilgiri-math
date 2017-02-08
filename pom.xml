@@ -5,7 +5,7 @@
 
     <groupId>com.accelad</groupId>
     <artifactId>nilgiri-math</artifactId>
-    <version>1.14</version>
+    <version>1.15-SNAPSHOT</version>
 
     <name>Nilgiri Math</name>
     <description>JAutoDiff</description>
@@ -160,7 +160,7 @@
         <connection>scm:git:git@github.com:accelad-com/nilgiri-math.git</connection>
         <developerConnection>scm:git:git@github.com:accelad-com/nilgiri-math.git</developerConnection>
         <url>git@github.com:accelad-com/nilgiri-math.git</url>
-        <tag>1.14</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <developers>
