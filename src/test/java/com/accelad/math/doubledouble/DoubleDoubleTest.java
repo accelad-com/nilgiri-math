@@ -1,5 +1,7 @@
 package com.accelad.math.doubledouble;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +13,19 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableMap;
 
 public class DoubleDoubleTest {
+
+    @Test
+    public void should_return_the_correct_value_when_given_value_is_powered_by_two_and_then_powered_by_three()
+            throws Exception {
+        DoubleDouble givenValue = DoubleDouble.fromString("1.2");
+        DoubleDouble two = DoubleDouble.fromString("2");
+        DoubleDouble givenValuePoweredByTwo = givenValue.pow(two);
+        assertThat(givenValuePoweredByTwo, is(DoubleDouble.fromString("1.44")));
+
+        DoubleDouble three = DoubleDouble.fromString("3");
+        DoubleDouble givenValuePoweredByThree = givenValue.pow(three);
+        assertThat(givenValuePoweredByThree, is(DoubleDouble.fromString("1.728")));
+    }
 
     @Test
     public void test1() throws Exception {

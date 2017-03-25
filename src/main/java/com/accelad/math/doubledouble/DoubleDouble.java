@@ -1,9 +1,9 @@
 package com.accelad.math.doubledouble;
 
+import java.io.Serializable;
+
 import com.google.common.base.Objects;
 import com.google.common.math.DoubleMath;
-
-import java.io.Serializable;
 
 public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDouble>, Cloneable {
 
@@ -849,7 +849,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     public DoubleDouble pow(DoubleDouble x) {
         DoubleDoubleCache<DoubleDouble> map = POW_DOUBLE_DOUBLE_CACHE.get(hi, lo,
                 DoubleDoubleCache::new);
-        return map.get(hi, lo, () -> innerPow(x));
+        return map.get(x.hi, x.lo, () -> innerPow(x));
     }
 
     private DoubleDouble innerPow(DoubleDouble x) {
