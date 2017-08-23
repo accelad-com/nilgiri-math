@@ -1,7 +1,5 @@
 package com.accelad.math.nilgiri;
 
-import org.apache.commons.math3.util.FastMath;
-
 import com.accelad.math.doubledouble.DoubleDouble;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
@@ -133,8 +131,9 @@ public class DoubleDoubleComplex implements ComplexNumber<DoubleDoubleReal, Doub
     }
 
     public DoubleDoubleComplex log() {
-        return new DoubleDoubleComplex(this.abs().re().log(),
-                new DoubleDoubleReal(FastMath.atan2(imaginary.doubleValue(), real.doubleValue())));
+        DoubleDoubleReal real = this.abs().re().log();
+        DoubleDouble imaginaryPart = DoubleDouble.atan2(this.imaginary.getDoubleDouble(), this.real.getDoubleDouble());
+        return new DoubleDoubleComplex(real, new DoubleDoubleReal(imaginaryPart));
     }
 
     @Override

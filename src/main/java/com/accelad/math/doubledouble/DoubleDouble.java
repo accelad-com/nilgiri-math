@@ -1,7 +1,6 @@
 package com.accelad.math.doubledouble;
 
 import com.google.common.base.Objects;
-import com.google.common.math.DoubleMath;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -50,6 +49,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     public static final DoubleDouble TWO = fromOneDouble(2.0);
     private static final DoubleDouble TEN = fromOneDouble(10.0);
     private static final DoubleDouble LOG_TEN = TEN.log();
+    private static final DoubleDouble TWENTY_NINE_DIGIT_VALUE = DoubleDouble.fromOneDouble(1E29);
 
     public static DoubleDouble fromString(String str) {
         int i = 0;
@@ -227,7 +227,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return s;
     }
 
-    public static DoubleDouble atan2(DoubleDouble x, DoubleDouble y) {
+    public static DoubleDouble atan2(DoubleDouble y, DoubleDouble x) {
         if (x.signum() == 0) {
             if (y.signum() == 0) throw new ArithmeticException("Angle of (0, 0)");
             else if (y.signum() > 0) return PI_2;
@@ -1220,9 +1220,13 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
     @Override
     public boolean equals(Object object) {
         if (object instanceof DoubleDouble) {
-            DoubleDouble that = (DoubleDouble) object;
-            return DoubleMath.fuzzyEquals(hi, that.hi, 1E-12) && DoubleMath.fuzzyEquals(lo, that.lo,
-                    1E-12);
+            DoubleDouble other = (DoubleDouble) object;
+
+            if (other.hi == this.hi && other.lo == this.lo) return true;
+
+            DoubleDouble criteria = other.divide(TWENTY_NINE_DIGIT_VALUE).abs();
+            boolean lowerThan = other.subtract(this).abs().lt(criteria);
+            return lowerThan;
         }
         return false;
     }

@@ -4,6 +4,7 @@ package com.accelad.math.nilgiri;
 public interface AbstractFactory<X extends Field<X>>
         extends AbstractIdentityFactory<X> {
 
+    X val(String valueAsString);
     X val(double i_v);
 
     X abs(X i_x);
