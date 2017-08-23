@@ -1,7 +1,8 @@
 package com.accelad.math.nilgiri;
 
 import com.accelad.math.doubledouble.DoubleDouble;
-import com.google.common.base.Objects;
+
+import java.util.Objects;
 
 public class DoubleDoubleReal
         implements RealNumber<DoubleDoubleReal>, Comparable<DoubleDoubleReal> {
@@ -202,17 +203,16 @@ public class DoubleDoubleReal
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(doubleDouble);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DoubleDoubleReal that = (DoubleDoubleReal) o;
+        return Objects.equals(doubleDouble, that.doubleDouble);
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (object instanceof DoubleDoubleReal) {
-            DoubleDoubleReal that = (DoubleDoubleReal) object;
-            return Objects.equal(this.doubleDouble, that.doubleDouble);
-        }
-        return false;
+    public int hashCode() {
+        return Objects.hash(doubleDouble);
     }
 
     @Override
