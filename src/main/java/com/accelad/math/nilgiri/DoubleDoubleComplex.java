@@ -1,8 +1,8 @@
 package com.accelad.math.nilgiri;
 
 import com.accelad.math.doubledouble.DoubleDouble;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
+
+import java.util.Objects;
 
 public class DoubleDoubleComplex implements ComplexNumber<DoubleDoubleReal, DoubleDoubleComplex> {
 
@@ -137,26 +137,25 @@ public class DoubleDoubleComplex implements ComplexNumber<DoubleDoubleReal, Doub
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(imaginary, real);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DoubleDoubleComplex that = (DoubleDoubleComplex) o;
+        return Objects.equals(imaginary, that.imaginary) &&
+                Objects.equals(real, that.real);
     }
 
     @Override
-    public boolean equals(Object object) {
-        if (object instanceof DoubleDoubleComplex) {
-            DoubleDoubleComplex that = (DoubleDoubleComplex) object;
-            return Objects.equal(this.imaginary, that.imaginary) && Objects.equal(this.real,
-                    that.real);
-        }
-        return false;
+    public int hashCode() {
+        return Objects.hash(imaginary, real);
     }
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-                          .add("imaginary", imaginary)
-                          .add("real", real)
-                          .toString();
+        return "DoubleDoubleComplex{" +
+                "imaginary=" + imaginary +
+                ", real=" + real +
+                '}';
     }
 
     @Override

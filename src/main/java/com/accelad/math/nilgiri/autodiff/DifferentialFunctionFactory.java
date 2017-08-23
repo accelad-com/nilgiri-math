@@ -1,12 +1,11 @@
 package com.accelad.math.nilgiri.autodiff;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.accelad.math.nilgiri.AbstractFactory;
 import com.accelad.math.nilgiri.DoubleReal;
 import com.accelad.math.nilgiri.DoubleRealFactory;
 import com.accelad.math.nilgiri.Field;
+
+import java.util.List;
 
 public class DifferentialFunctionFactory<X extends Field<X>> {
 
@@ -24,56 +23,12 @@ public class DifferentialFunctionFactory<X extends Field<X>> {
         return new Constant<>(iX, mFactory);
     }
 
-    public ConstantVector<X> val(X... iX) {
-        int size = iX.length;
-        ArrayList<Constant<X>> list = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            list.add(val(iX[i]));
-        }
-        return new ConstantVector<>(mFactory, list);
-    }
-
-    // ZeroVector
-    public ConstantVector<X> zero(int iSize) {
-        ArrayList<Constant<X>> list = new ArrayList<>(iSize);
-        for (int i = 0; i < iSize; i++) {
-            list.add(zero());
-        }
-        return new ConstantVector<>(mFactory, list);
-    }
-
     public Variable<X> var(String iName, X iX, PreEvaluator<X> preEvaluator) {
         return new Variable<>(iName, iX, mFactory, preEvaluator);
     }
 
     public Variable<X> var(String iName, X iX) {
         return new Variable<>(iName, iX, mFactory);
-    }
-
-    public VariableVector<X> var(String iName, X... iX) {
-        int size = iX.length;
-        ArrayList<Variable<X>> list = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            list.add(var(iName + String.valueOf(i), iX[i]));
-        }
-        return new VariableVector<>(mFactory, list);
-    }
-
-    public VariableVector<X> var(String iName, int iSize) {
-        ArrayList<Variable<X>> list = new ArrayList<>(iSize);
-        for (int i = 0; i < iSize; i++) {
-            list.add(var(iName + String.valueOf(i), mFactory.zero()));
-        }
-        return new VariableVector<>(mFactory, list);
-    }
-
-    public DifferentialVectorFunction<X> function(DifferentialFunction<X>... iX) {
-        int size = iX.length;
-        ArrayList<DifferentialFunction<X>> list = new ArrayList<>(size);
-        for (int i = 0; i < size; i++) {
-            list.add(iX[i]);
-        }
-        return new DifferentialVectorFunction<>(mFactory, list);
     }
 
     public Zero<X> zero() {

@@ -1,11 +1,12 @@
 package com.accelad.math.doubledouble;
 
-import com.google.common.base.Objects;
+
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.Objects;
 
 public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDouble>, Cloneable {
 
@@ -1214,7 +1215,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(hi, lo);
+        return Objects.hash(hi, lo);
     }
 
     @Override

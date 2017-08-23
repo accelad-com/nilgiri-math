@@ -1,9 +1,10 @@
 package com.accelad.math.doubledouble;
 
-import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import static com.accelad.math.doubledouble.DoubleDouble.*;
@@ -208,28 +209,28 @@ public class DoubleDoubleTest {
 
     @Test
     public void testParse() throws Exception {
-        ImmutableMap<String, DoubleDouble> testData = ImmutableMap.<String, DoubleDouble> builder()
-                .put("1E14", DoubleDouble.fromOneDouble(1E14))
-                .put("-1E17", DoubleDouble.fromOneDouble(-1E17))
-                .put(" -1E17", DoubleDouble.fromOneDouble(-1E17))
-                .put(" 1E14", DoubleDouble.fromOneDouble(1E14))
-                .put("+1E14", DoubleDouble.fromOneDouble(1E14))
-                .put("1e14", DoubleDouble.fromOneDouble(1E14))
-                .put("-1e17", DoubleDouble.fromOneDouble(-1E17))
-                .put(" -1e17", DoubleDouble.fromOneDouble(-1E17))
-                .put(" 1e14", DoubleDouble.fromOneDouble(1E14))
-                .put("+1e14", DoubleDouble.fromOneDouble(1E14))
-                .put("1.0000000399999998E-4", DoubleDouble.fromTwoDouble(1.0000000399999998E-4, 0.4743564752683E-20))
-                .put("3.93460376843724", DoubleDouble.fromTwoDouble(3.93460376843724, -1.3440350972814486E-16))
-                .put("1.0000000299999998E-4", DoubleDouble.fromTwoDouble(1.0000000299999998E-4, 7.477619529328194E-22))
-                .put("3.9346037077899485", DoubleDouble.fromTwoDouble(3.9346037077899485, -1.2721925158985238E-18))
-                .put("1.0000000199999998E-4", DoubleDouble.fromTwoDouble(1.0000000199999998E-4, -3.248040846817162E-21))
-                .put("3.934603647142657", DoubleDouble.fromTwoDouble(3.934603647142657, 1.3185912469634786E-16))
-                .put("1.0000000099999999E-4", DoubleDouble.fromTwoDouble(1.0000000099999999E-4, 2.7561563534328564E-21))
-                .put("3.9346035864953652", DoubleDouble.fromTwoDouble(3.9346035864953652, -3.50095580914058E-17))
-                .build();
+        Map<String, DoubleDouble> map = new HashMap<>();
+        map.put("1E14", DoubleDouble.fromOneDouble(1E14));
+        map.put("-1E17", DoubleDouble.fromOneDouble(-1E17));
+        map.put(" -1E17", DoubleDouble.fromOneDouble(-1E17));
+        map.put(" 1E14", DoubleDouble.fromOneDouble(1E14));
+        map.put("+1E14", DoubleDouble.fromOneDouble(1E14));
+        map.put("1e14", DoubleDouble.fromOneDouble(1E14));
+        map.put("-1e17", DoubleDouble.fromOneDouble(-1E17));
+        map.put(" -1e17", DoubleDouble.fromOneDouble(-1E17));
+        map.put(" 1e14", DoubleDouble.fromOneDouble(1E14));
+        map.put("+1e14", DoubleDouble.fromOneDouble(1E14));
+        map.put("1.0000000399999998E-4", DoubleDouble.fromTwoDouble(1.0000000399999998E-4, 0.4743564752683E-20));
+        map.put("3.93460376843724", DoubleDouble.fromTwoDouble(3.93460376843724, -1.3440350972814486E-16));
+        map.put("1.0000000299999998E-4", DoubleDouble.fromTwoDouble(1.0000000299999998E-4, 7.477619529328194E-22));
+        map.put("3.9346037077899485", DoubleDouble.fromTwoDouble(3.9346037077899485, -1.2721925158985238E-18));
+        map.put("1.0000000199999998E-4", DoubleDouble.fromTwoDouble(1.0000000199999998E-4, -3.248040846817162E-21));
+        map.put("3.934603647142657", DoubleDouble.fromTwoDouble(3.934603647142657, 1.3185912469634786E-16));
+        map.put("1.0000000099999999E-4", DoubleDouble.fromTwoDouble(1.0000000099999999E-4, 2.7561563534328564E-21));
+        map.put("3.9346035864953652", DoubleDouble.fromTwoDouble(3.9346035864953652, -3.50095580914058E-17));
 
-        for (Entry<String, DoubleDouble> entry : testData.entrySet()) {
+
+        for (Entry<String, DoubleDouble> entry : map.entrySet()) {
             DoubleDouble actual = DoubleDouble.fromString(entry.getKey());
             DoubleDouble expected = entry.getValue();
             String message = entry.getKey() + " is not equal to " + entry.getValue();
