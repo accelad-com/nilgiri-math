@@ -6,6 +6,9 @@ import org.junit.Test;
 
 import java.util.Map.Entry;
 
+import static com.accelad.math.doubledouble.DoubleDouble.ONE;
+import static com.accelad.math.doubledouble.DoubleDouble.PI;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -24,6 +27,71 @@ public class DoubleDoubleTest {
         DoubleDouble three = DoubleDouble.fromString("3");
         DoubleDouble givenValuePoweredByThree = givenValue.pow(three);
         assertThat(givenValuePoweredByThree, is(DoubleDouble.fromString("1.728")));
+    }
+
+    @Test(expected = ArithmeticException.class)
+    public void should_throw_an_exception_when_computing_atan2_with_x_and_y_equals_zero() throws Exception {
+        DoubleDouble x = DoubleDouble.ZERO;
+        DoubleDouble y = DoubleDouble.ZERO;
+        DoubleDouble.atan2(x, y);
+    }
+
+    @Test()
+    public void should_return_positive_half_PI_when_computing_atan2_with_x_equals_zero_and_y_is_positive() throws Exception {
+        DoubleDouble x = DoubleDouble.ZERO;
+        DoubleDouble y = ONE;
+        DoubleDouble result = DoubleDouble.atan2(x, y);
+
+        assertThat(result, equalTo(DoubleDouble.PI_2));
+    }
+
+    @Test()
+    public void should_return_negative_half_PI_when_computing_atan2_with_x_equals_zero_and_y_is_negative() throws Exception {
+        DoubleDouble x = DoubleDouble.ZERO;
+        DoubleDouble y = ONE.negate();
+        DoubleDouble result = DoubleDouble.atan2(x, y);
+
+        assertThat(result, equalTo(DoubleDouble.PI_2.negate()));
+    }
+
+    @Test()
+    public void should_return_the_atan_of_y_divided_by_x_when_computing_atan2_with_x_is_positive() throws Exception {
+        DoubleDouble x = ONE;
+        DoubleDouble y = DoubleDouble.TWO;
+        DoubleDouble result = DoubleDouble.atan2(x, y);
+        DoubleDouble expected = y.divide(x).atan();
+
+        assertThat(result, equalTo(expected));
+    }
+
+    @Test()
+    public void should_return_PI_plus_the_atan_of_y_divided_by_x_when_computing_atan2_with_x_is_negative_and_y_is_positive() throws Exception {
+        DoubleDouble x = ONE.negate();
+        DoubleDouble y = DoubleDouble.TWO;
+        DoubleDouble result = DoubleDouble.atan2(x, y);
+        DoubleDouble expected = y.divide(x).atan().add(PI);
+
+        assertThat(result, equalTo(expected));
+    }
+
+    @Test()
+    public void should_return_the_atan_of_y_divided_by_x_plus_PI_when_computing_atan2_with_x_is_negative_and_y_is_zero() throws Exception {
+        DoubleDouble x = ONE.negate();
+        DoubleDouble y = DoubleDouble.ZERO;
+        DoubleDouble result = DoubleDouble.atan2(x, y);
+        DoubleDouble expected = y.divide(x).atan().add(PI);
+
+        assertThat(result, equalTo(expected));
+    }
+
+    @Test()
+    public void should_return_the_atan_of_y_divided_by_x_minus_pi_when_computing_atan2_with_x_is_negative_and_y_is_negative() throws Exception {
+        DoubleDouble x = ONE.negate();
+        DoubleDouble y = DoubleDouble.TWO.negate();
+        DoubleDouble result = DoubleDouble.atan2(x, y);
+        DoubleDouble expected = y.divide(x).atan().subtract(PI);
+
+        assertThat(result, equalTo(expected));
     }
 
     @Test

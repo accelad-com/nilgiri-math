@@ -227,6 +227,19 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return s;
     }
 
+    public static DoubleDouble atan2(DoubleDouble x, DoubleDouble y) {
+        if (x.signum() == 0) {
+            if (y.signum() == 0) throw new ArithmeticException("Angle of (0, 0)");
+            else if (y.signum() > 0) return PI_2;
+            else return PI_2.negate();
+        } else if (x.signum() > 0) {
+            return y.divide(x).atan();
+        } else {
+            if (y.signum() >= 0) return y.divide(x).atan().add(PI);
+            else return y.divide(x).atan().subtract(PI);
+        }
+    }
+
     public DoubleDouble atan() {
         if (isNaN) {
             return NaN;
