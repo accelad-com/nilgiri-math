@@ -1,16 +1,15 @@
 package com.accelad.math.doubledouble;
 
+import com.google.common.collect.ImmutableMap;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.Map.Entry;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.util.Map.Entry;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import com.google.common.collect.ImmutableMap;
 
 public class DoubleDoubleTest {
 
@@ -67,6 +66,16 @@ public class DoubleDoubleTest {
     public void testToString() throws Exception {
         DoubleDouble dd = DoubleDouble.fromOneDouble(4.75);
         Assert.assertEquals("4.75", dd.toString());
+    }
+
+    @Test
+    public void should_return_the_correct_precise_string_representation_when_value_is_30_digits_precise() throws Exception {
+        String expectedString = "0.12345678901234567890123456789";
+        DoubleDouble parsedValue = DoubleDouble.fromString(expectedString);
+
+        String returnedValuesAsString = parsedValue.toString();
+
+        assertEquals(expectedString, returnedValuesAsString);
     }
 
     @Test

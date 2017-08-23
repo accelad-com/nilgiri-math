@@ -1,9 +1,12 @@
 package com.accelad.math.doubledouble;
 
-import java.io.Serializable;
-
 import com.google.common.base.Objects;
 import com.google.common.math.DoubleMath;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 
 public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDouble>, Cloneable {
 
@@ -1175,7 +1178,14 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     @Override
     public String toString() {
-        return Double.toString(doubleValue());
+        BigDecimal hiPart = new BigDecimal(hi);
+        BigDecimal loPart = new BigDecimal(lo);
+        int numberOfSignificantDigits = 30;
+        MathContext roundingContextAt30Digits = new MathContext(numberOfSignificantDigits, RoundingMode.HALF_UP);
+        return hiPart.add(loPart)
+                .round(roundingContextAt30Digits)
+                .stripTrailingZeros()
+                .toPlainString();
     }
 
     public DoubleDouble trunc() {
