@@ -1,9 +1,6 @@
 package com.accelad.math.nilgiri;
 
-import java.util.Map;
 import java.util.Random;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class DoubleRealFactory implements AbstractFactory<DoubleReal> {
 
@@ -18,6 +15,11 @@ public class DoubleRealFactory implements AbstractFactory<DoubleReal> {
         return m_INSTANCE;
     }
 
+
+    @Override
+    public DoubleReal val(String valueAsString) {
+        return new DoubleReal(valueAsString);
+    }
 
     @Override
     public DoubleReal val(double v) {

@@ -1,21 +1,25 @@
 package com.accelad.math.nilgiri;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 import java.util.function.BiFunction;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractFactoriesTest<X extends Field<X>> {
 
     private final double testEpsilon;
 
-    protected AbstractFactoriesTest(double testEpsilon) {
+    AbstractFactoriesTest(double testEpsilon) {
         this.testEpsilon = testEpsilon;
     }
 
     private X generateVal(double input) {
+        return getFactory().val(input);
+    }
+
+    private X generateVal(String input) {
         return getFactory().val(input);
     }
 
@@ -153,26 +157,26 @@ public abstract class AbstractFactoriesTest<X extends Field<X>> {
 
     @Test
     public void testPwr() {
-        assertEquals(generateVal(0.3535533905932738),
+        assertEquals(generateVal("0.353553390593273762200422181052"),
                 getFactory().pwr(generateVal(0.5), generateVal(1.5)));
-        assertEquals(generateVal(0.3535533905932738),
+        assertEquals(generateVal("0.353553390593273762200422181052"),
                 getFactory().pwr(generateVal(-0.5), generateVal(1.5)));
     }
 
     @Test
     public void testPwrs() {
-        assertEquals(generateVal(0.3535533905932738),
+        assertEquals(generateVal("0.353553390593273762200422181052"),
                 getFactory().pwr(generateVal(0.5), generateVal(1.5)));
-        assertEquals(generateVal(-0.3535533905932738),
+        assertEquals(generateVal("-0.353553390593273762200422181052"),
                 getFactory().pwrs(generateVal(-0.5), generateVal(1.5)));
     }
 
     @Test
     public void testHypot() {
         assertEquals(
-                generateVal(5.6568542494923810), getFactory().hypot(generateVal(4), generateVal(4)));
+                generateVal("5.65685424949238019520675489684"), getFactory().hypot(generateVal(4), generateVal(4)));
         assertEquals(
-                generateVal(2.8284271247461903), getFactory().hypot(generateVal(2), generateVal(2)));
+                generateVal("2.82842712474619009760337744842"), getFactory().hypot(generateVal(2), generateVal(2)));
     }
 
     @Test

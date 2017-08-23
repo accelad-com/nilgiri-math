@@ -31,6 +31,11 @@ public class DoubleDoubleComplexFactory
     }
 
     @Override
+    public DoubleDoubleComplex val(String valueAsString) {
+        return new DoubleDoubleComplex(new DoubleDoubleReal(valueAsString));
+    }
+
+    @Override
     public DoubleDoubleComplex val(double value) {
         return new DoubleDoubleComplex(value);
     }
