@@ -28,6 +28,48 @@ public class DoubleDoubleTest {
         assertThat(givenValuePoweredByThree, is(DoubleDouble.fromString("1.728")));
     }
 
+    @Test
+    public void should_return_nan_when_log_too_high() {
+        double notComputableMaxValue = (Double.MAX_VALUE / DoubleDouble.SPLIT) * DoubleDouble.E.doubleValue();
+        DoubleDouble givenValue = DoubleDouble.fromOneDouble(notComputableMaxValue);
+
+        DoubleDouble log = givenValue.log();
+
+        assertTrue(log.isNaN());
+    }
+
+    @Test
+    public void should_return_value_when_log_the_max_value_acceptable() {
+        double split = DoubleDouble.SPLIT + 1;
+        double maxComputableValue = (Double.MAX_VALUE / split) * DoubleDouble.E.doubleValue();
+        DoubleDouble givenValue = DoubleDouble.fromOneDouble(maxComputableValue);
+
+        DoubleDouble log = givenValue.log();
+
+        assertFalse(log.isNaN());
+    }
+
+    @Test
+    public void should_return_nan_when_pow_too_high() {
+        double notComputableMaxValue = (Double.MAX_VALUE / DoubleDouble.SPLIT) * DoubleDouble.E.doubleValue();
+        DoubleDouble givenValue = DoubleDouble.fromOneDouble(notComputableMaxValue);
+
+        DoubleDouble log = givenValue.pow(DoubleDouble.fromOneDouble(2));
+
+        assertTrue(log.isNaN());
+    }
+
+    @Test
+    public void should_return_value_when_pow_the_max_value_acceptable() {
+        double split = DoubleDouble.SPLIT + 1;
+        double maxComputableValue = (Double.MAX_VALUE / split) * DoubleDouble.E.doubleValue();
+        DoubleDouble givenValue = DoubleDouble.fromOneDouble(maxComputableValue);
+
+        DoubleDouble log = givenValue.pow(DoubleDouble.fromOneDouble(2));
+
+        assertFalse(log.isNaN());
+    }
+
     @Test(expected = ArithmeticException.class)
     public void should_throw_an_exception_when_computing_atan2_with_x_and_y_equals_zero() throws Exception {
         DoubleDouble x = DoubleDouble.ZERO;
