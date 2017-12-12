@@ -43,7 +43,9 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             Double.NEGATIVE_INFINITY);
 
     public static final double EPS = 1.23259516440783e-32; /* = 2^-106 */
-    private static final double SPLIT = 134217729.0D; // 2^27+1, for IEEE double
+
+    static final double SPLIT = 134217729.0D; // 2^27+1, for IEEE double
+    private static final DoubleDouble MAX_COMPUTABLE_VALUE_FOR_LOG = fromOneDouble((Double.MAX_VALUE / SPLIT) * E.doubleValue());
 
     public static final DoubleDouble ONE = fromOneDouble(1.0);
     public static final DoubleDouble MINUS_ONE = fromOneDouble(-1.0);
@@ -788,7 +790,7 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             return NEGATIVE_INFINITY;
         }
 
-        if (isNegative()) {
+        if (isNegative() || isGreaterForLogFunction()) {
             return NaN;
         }
 
@@ -820,7 +822,12 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
             sOld = s;
             s = s.add(w);
         } while (s.ne(sOld));
-        return s.add(fromOneDouble(intPart));
+        DoubleDouble y = fromOneDouble(intPart);
+        return s.add(y);
+    }
+
+    private boolean isGreaterForLogFunction() {
+        return this.ge(MAX_COMPUTABLE_VALUE_FOR_LOG);
     }
 
     public DoubleDouble log10() {
@@ -863,52 +870,30 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
         return fromTwoDouble(-hi, -lo);
     }
 
-    public DoubleDouble pow(DoubleDouble x) {
+    public DoubleDouble pow(DoubleDouble power) {
         DoubleDoubleCache<DoubleDouble> map = POW_DOUBLE_DOUBLE_CACHE.get(hi, lo,
                 DoubleDoubleCache::new);
-        return map.get(x.hi, x.lo, () -> innerPow(x));
+        return map.get(power.hi, power.lo, () -> innerPow(power));
     }
 
-    private DoubleDouble innerPow(DoubleDouble x) {
-        boolean invert = false;
-        if (x.isNaN || x.isInfinite() || isInfinite() || isNaN) {
+    private DoubleDouble innerPow(DoubleDouble power) {
+        if (power.isNaN || power.isInfinite() || isInfinite() || isNaN) {
             return NaN;
         }
-        if (x.isZero()) {
+        if (power.isZero()) {
             return ONE;
         } else {
             if (isZero()) {
                 return ZERO;
             } else if (isNegative()) {
-                if (x.isInteger())
-                    return pow(x.intValue());
+                if (power.isInteger())
+                    return pow(power.intValue());
                 else
                     return NaN;
             } else {
                 final DoubleDouble loga = this.log();
-                DoubleDouble base = x.multiply(loga);
-                if (base.lt(ZERO)) {
-                    // Much greater precision if all numbers in the series have the same
-                    // sign.
-                    base = base.negate();
-                    invert = true;
-                }
-                DoubleDouble s = ONE.add(base);
-                DoubleDouble sOld;
-                DoubleDouble t = fromDoubleDouble(base);
-                double n = 1.0;
-
-                do {
-                    n += 1.0;
-                    t = t.divide(fromOneDouble(n));
-                    t = t.multiply(base);
-                    sOld = s;
-                    s = s.add(t);
-                } while (s.ne(sOld));
-                if (invert) {
-                    s = s.reciprocal();
-                }
-                return s;
+                DoubleDouble base = power.multiply(loga);
+                return base.innerExp();
             }
         }
     }
@@ -1192,14 +1177,15 @@ public strictfp class DoubleDouble implements Serializable, Comparable<DoubleDou
 
     @Override
     public String toString() {
-        BigDecimal hiPart = new BigDecimal(hi);
-        BigDecimal loPart = new BigDecimal(lo);
-        int numberOfSignificantDigits = 30;
-        MathContext roundingContextAt30Digits = new MathContext(numberOfSignificantDigits, RoundingMode.HALF_UP);
-        return hiPart.add(loPart)
-                .round(roundingContextAt30Digits)
-                .stripTrailingZeros()
-                .toPlainString();
+        if (this.isNaN) {
+            return "NaN";
+        } else {
+            BigDecimal hiPart = new BigDecimal(hi);
+            BigDecimal loPart = new BigDecimal(lo);
+            int numberOfSignificantDigits = 30;
+            MathContext roundingContextAt30Digits = new MathContext(numberOfSignificantDigits, RoundingMode.HALF_UP);
+            return hiPart.add(loPart).round(roundingContextAt30Digits).stripTrailingZeros().toPlainString();
+        }
     }
 
     public DoubleDouble trunc() {
